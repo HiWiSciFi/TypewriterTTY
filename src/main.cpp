@@ -11,9 +11,9 @@ typedef struct KeymapEntry {
   uint8_t mod;
 };
 
-#define MOD_NONE  0b00000000
-#define MOD_SHIFT 0b00000001
-#define MOD_CODE  0b00000010
+#define MOD_NONE  0x00
+#define MOD_SHIFT 0x01
+#define MOD_CODE  0x02
 
 #define KEY_RETURN 0x3C // ASCII '<'
 
