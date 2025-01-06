@@ -13,7 +13,10 @@ struct KeymapEntry {
 #define MOD_SHIFT 0x01
 #define MOD_CODE  0x02
 
-#define KEY_RETURN 0x3C // ASCII '<'
+#define KEY_RETURN    0x3C // ASCII '<' --> RET
+#define KEY_MICRO     0x3E // ASCII '>' --> µ
+#define KEY_BACKSPACE 0x40 // ASCII '@' --> BACK
+#define KEY_DEL_WORD  0x5B // ASCII '[' --> WORD OUT
 
 // index = char - 0x20
 extern KeymapEntry keymap[91];

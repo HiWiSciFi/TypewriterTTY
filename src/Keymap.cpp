@@ -26,13 +26,11 @@
   // { 0, 4, MOD_NONE  }, // T+
   // { 0, 4, MOD_CODE  }, // T-
   // { 0, 5, MOD_NONE  }, // Caps Lock
-  // { 0, 7, MOD_NONE  }, // WORD OUT
   // { 0, 7, MOD_CODE  }, // LINE OUT
   // { 1, 1, MOD_CODE  }, // L IND Top
   // { 1, 3, MOD_CODE  }, // L IND Bot
   // { 1, 1, MOD_NONE  }, // Return L Top
   // { 1, 3, MOD_NONE  }, // Return L Bot
-  // { 6, 7, MOD_NONE  }, // Backspace?
   // { 6, 7, MOD_CODE  }, // DEL?
   // { 7, 0, MOD_NONE  }, // <-||->
   // { 7, 2, MOD_NONE  }, // RELOC
@@ -44,8 +42,8 @@
 
   // { 8, 6, MOD_NONE  }, // SHIFT L R
 
-  { 0, 6, MOD_NONE  }, // 0x20 SPACE L
-  // { 7, 7, MOD_NONE  }, // 0x20 SPACE R
+  // { 0, 6, MOD_NONE  }, // 0x20 SPACE L <-- WORKN'T!
+  { 7, 7, MOD_NONE  }, // 0x20 SPACE R
   { 2, 0, MOD_SHIFT }, // 0x21 !
   { 2, 1, MOD_SHIFT }, // 0x22 "
   { 6, 5, MOD_NONE  }, // 0x23 #
@@ -75,9 +73,9 @@
   { 4, 7, MOD_SHIFT }, // 0x3B ;
   { 7, 4, MOD_NONE  }, // 0x3C CRLF ! ASCII <
   { 6, 1, MOD_SHIFT }, // 0x3D =
-  { 255, 255, MOD_NONE  }, // 0x3E > NOT
+  { 4, 2, MOD_CODE  }, // 0x3E µ ! ASCII >
   { 6, 6, MOD_SHIFT }, // 0x3F ?
-  { 255, 255, MOD_NONE  }, // 0x40 @ NOT
+  { 6, 7, MOD_NONE  }, // 0x40 Backspace ! ASCII @
   { 1, 4, MOD_SHIFT }, // 0x41 A
   { 3, 6, MOD_SHIFT }, // 0x42 B
   { 2, 6, MOD_SHIFT }, // 0x43 C
@@ -104,7 +102,7 @@
   { 1, 7, MOD_SHIFT }, // 0x58 X
   { 1, 6, MOD_SHIFT }, // 0x59 Y
   { 4, 3, MOD_SHIFT }, // 0x5A Z
-  { 255, 255, MOD_NONE  }, // 0x5B [ NOT
+  { 0, 7, MOD_NONE  }, // 0x5B WORD OUT ! ASCII [
   { 255, 255, MOD_NONE  }, // 0x5C /* \ */ NOT
   { 255, 255, MOD_NONE  }, // 0x5D ] NOT
   { 255, 255, MOD_NONE  }, // 0x5E ^ NOT
