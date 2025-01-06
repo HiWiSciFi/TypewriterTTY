@@ -5,7 +5,7 @@ uint8_t outPorts[8]  = { 34, 35, 36, 37, 38, 39, 40, 41 };
 
 #define ASIZE(arr) (sizeof( arr ) / sizeof( arr[0] ))
 
-typedef struct KeymapEntry {
+struct KeymapEntry {
   uint8_t scan;
   uint8_t out;
   uint8_t mod;
@@ -158,35 +158,30 @@ KeymapEntry keymap[] = {
 void setup() {
   Serial.begin(921600);
 
-  for (int i = 0; i < ASIZE(scanPorts); i++) pinMode(scanPorts[i], INPUT);
-  for (int i = 0; i < ASIZE(outPorts);  i++) {
+  for (uint8_t i = 0; i < ASIZE(scanPorts); i++) pinMode(scanPorts[i], INPUT);
+  for (uint8_t i = 0; i < ASIZE(outPorts);  i++) {
     pinMode(outPorts[i], OUTPUT);
     digitalWrite(outPorts[i], HIGH);
   }
 }
 
-uint8_t lastPin = 0;
-uint8_t last = 0;
-
-#define RISING  LOW
-#define FALLING HIGH
-
-void waitFor(uint8_t scan, uint8_t state) {
-  while (digitalRead(scanPorts[scan]) == state);
+void waitForEdge(uint8_t scan, uint8_t state) {
+  uint8_t targetState = state == RISING ? LOW : HIGH;
+  while (digitalRead(scanPorts[scan]) == targetState);
 }
 
 void writeKey(size_t keycode) {
   KeymapEntry key = keymap[keycode - 0x20];
   for (int i = 0; i < 2; i++) {
-    waitFor(key.scan, FALLING);
+    waitForEdge(key.scan, FALLING);
     digitalWrite(outPorts[key.out], LOW);
-    waitFor(key.scan, RISING);
+    waitForEdge(key.scan, RISING);
     digitalWrite(outPorts[key.out], HIGH);
   }
-  waitFor(key.scan, FALLING);
+  waitForEdge(key.scan, FALLING);
   for (int i = 0; i < 3; i++) {
-    waitFor(key.scan, RISING);
-    waitFor(key.scan, FALLING);
+    waitForEdge(key.scan, RISING);
+    waitForEdge(key.scan, FALLING);
   }
 }
 
