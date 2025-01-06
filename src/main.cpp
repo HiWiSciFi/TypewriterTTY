@@ -6,6 +6,7 @@ uint8_t outPorts[8]  = { 34, 35, 36, 37, 38, 39, 40, 41 };
 
 #define ASIZE(arr) (sizeof( arr ) / sizeof( arr[0] ))
 
+// TODO: consider using INPUT_PULLUP
 void setup() {
   Serial.begin(921600);
   while (!Serial);
