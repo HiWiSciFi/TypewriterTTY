@@ -5,10 +5,10 @@
  KeymapEntry keymap[91] = {
   // { 3, 0, MOD_SHIFT }, // §
   // { 7, 1, MOD_NONE  }, // ´
-  // { 4, 2, MOD_CODE  }, µ
-  // { 1, 7, MOD_CODE  }, ²
-  // { 2, 7, MOD_CODE  }, ³
-  // { 2, 3, MOD_CODE  }, °
+  // { 4, 2, MOD_CODE  }, // µ
+  // { 1, 7, MOD_CODE  }, // ²
+  // { 2, 7, MOD_CODE  }, // ³
+  // { 2, 3, MOD_CODE  }, // °
   // { 6, 4, MOD_NONE  }, // ä
   // { 6, 4, MOD_SHIFT }, // Ä
   // { 5, 5, MOD_NONE  }, // ö
