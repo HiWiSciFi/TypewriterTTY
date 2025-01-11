@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "Keyboard.hpp"
 
-uint8_t scanPorts[9] = { 53, 52, 51, 50, 49, 48, 47, 46, 45 };
-uint8_t outPorts[8]  = { 34, 35, 36, 37, 38, 39, 40, 41 };
+uint8_t scanPorts[9] = { 12, 11, 10, 9, 8, 7, 6, 5, 4 };
+uint8_t outPorts[8] = { 14, 15, 16, 17, 18, 19, 20, 21 };
 
 #define ASIZE(arr) (sizeof( arr ) / sizeof( arr[0] ))
 
@@ -12,7 +12,7 @@ void setup() {
   while (!Serial);
 
   for (uint8_t i = 0; i < ASIZE(scanPorts); i++) pinMode(scanPorts[i], INPUT);
-  for (uint8_t i = 0; i < ASIZE(outPorts);  i++) {
+  for (uint8_t i = 0; i < ASIZE(outPorts); i++) {
     pinMode(outPorts[i], OUTPUT);
     digitalWrite(outPorts[i], HIGH);
   }
@@ -57,6 +57,6 @@ void loop() {
   // writeKey('!');
 
   // writeKey(KEY_RETURN); // CR LF
-  
+
   // delay(2000);
 }
