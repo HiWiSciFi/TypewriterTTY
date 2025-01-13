@@ -7,12 +7,11 @@ extern uint8_t outPorts[8];
 
 static void waitForEdge(uint8_t scan, uint8_t state) {
   uint8_t targetState = state == RISING ? LOW : HIGH;
-  while (digitalRead(scanPorts[scan]) == targetState)
-    ;
+  while (digitalRead(scanPorts[scan]) == targetState);
 }
 
 void writeKey(uint16_t keycode) {
-  KeymapEntry key = keymap[keycode - 0x20];
+  KeymapEntry key = keymap[keycode];
 
   // Serial.print("Writing scan ");
   // Serial.print(key.scan);
