@@ -29,9 +29,6 @@ void loop() {
       break;
     case '\r':
       return;
-    case '\b':
-      c = KEY_BACKSPACE;
-      break;
     case 0x17:
       c = KEY_DEL_WORD;
       break;
