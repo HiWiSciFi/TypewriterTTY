@@ -1,5 +1,6 @@
-#include <iostream>
+#include <cstdint>
 #include <iomanip>
+#include <iostream>
 
 uint32_t readCodepoint() {
     int c = fgetc(stdin);
