@@ -5,7 +5,7 @@
 uint32_t readCodepoint() {
     int c = fgetc(stdin);
     if (c == EOF) {
-        // TODO: error
+        // TODO: fgetc error
     }
 
     uint8_t size = 0;
@@ -18,7 +18,7 @@ uint32_t readCodepoint() {
     else if ((c & 0b1111'1000) == 0b1111'0000)
         size = 3;
     else {
-        // TODO: error
+        // TODO: error, unexpected byte
     }
 
     static uint8_t masks[] = { 0b0111'1111, 0b0001'1111, 0b0000'1111, 0b0000'0111 };
@@ -28,9 +28,14 @@ uint32_t readCodepoint() {
 
     for (int8_t off = size - 1; off >= 0; off--) {
         c = fgetc(stdin);
-        if (c == EOF || (c & 0b1100'0000) != 0b1000'0000) {
-            // TODO: error
+        if (c == EOF) {
+            // TODO: fgetc error
         }
+
+        if ((c & 0b1100'0000) != 0b1000'0000) {
+            // TODO: error, unexpected byte
+        }
+
         codepoint |= c << (off * 6);
     }
 
