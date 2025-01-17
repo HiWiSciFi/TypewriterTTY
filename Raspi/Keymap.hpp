@@ -17,6 +17,13 @@ struct KeymapKey {
     int scan;
     int out;
     uint8_t mod;
+
+    bool operator<(const KeymapKey& rhs) {
+        return 
+            (scan < rhs.scan)
+            || (scan == rhs.scan && out < rhs.out)
+            || (scan == rhs.scan && out == rhs.out && mod < rhs.mod);
+    }
 };
 
 static std::map<KeymapKey, KeymapEntry> keymap = {
