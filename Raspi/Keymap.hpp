@@ -18,7 +18,7 @@ struct KeymapKey {
     int out;
     uint8_t mod;
 
-    bool operator<(const KeymapKey& rhs) {
+    bool operator<(const KeymapKey rhs) {
         return 
             (scan < rhs.scan)
             || (scan == rhs.scan && out < rhs.out)
