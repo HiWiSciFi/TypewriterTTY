@@ -98,10 +98,8 @@ KeymapEntry readKey() {
 
     // TODO: Read mod key
 
-    if (key.scan == -1) return { 0, 0 };
-
+    if (key.scan == -1 || keymap.count(key) == 0) return { 0, 0 };
     std::cout << "Key test " << key.scan << " " << key.out << std::endl;
-
     return keymap.at(key);
 }
 
