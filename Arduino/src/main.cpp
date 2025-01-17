@@ -1,8 +1,11 @@
 #include <Arduino.h>
 #include "Keyboard.hpp"
 
-uint8_t scanPorts[9] = { 12, 11, 10, 9, 8, 7, 6, 5, 4 };
-uint8_t outPorts[8] = { 14, 15, 16, 17, 18, 19, 20, 21 };
+uint8_t scanPorts[9] = { 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+uint8_t outPorts[8] = { 21, 20, 19, 18, 17, 16, 15, 14 };
+
+// uint8_t scanPorts[9] = { 45, 46, 47, 48, 49, 50, 51, 52, 53 };
+// uint8_t outPorts[8] = { 34, 35, 36, 37, 38, 39, 40, 41 };
 
 #define ASIZE(arr) (sizeof( arr ) / sizeof( arr[0] ))
 
@@ -35,6 +38,8 @@ void loop() {
     }
     writeKey(c);
   }
+
+  // writeKey(KEY_RETURN);
 
   // writeKey('H');
   // writeKey(KEY_MICRO);

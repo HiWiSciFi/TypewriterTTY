@@ -4,6 +4,8 @@
 
 #include <wiringPi.h>
 
+#include "Keymap.hpp"
+
 // +-----+-----+---------+------+---+Pi Zero 2W+---+------+---------+-----+-----+
 // | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
 // +-----+-----+---------+------+---+----++----+---+------+---------+-----+-----+
@@ -30,6 +32,9 @@
 // +-----+-----+---------+------+---+----++----+---+------+---------+-----+-----+
 // | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
 // +-----+-----+---------+------+---+Pi Zero 2W+---+------+---------+-----+-----+
+
+int pinsScan[] = { 2, 3, 4, 17, 27, 22, 10, 9, 11 };
+int pinsOut[] = { 18, 23, 24, 25, 8, 7, 12, 16 };
 
 uint32_t readCodepoint() {
     int c = fgetc(stdin);
@@ -71,17 +76,51 @@ uint32_t readCodepoint() {
     return codepoint;
 }
 
+KeymapEntry readKey() {
+    KeymapKey key = { -1, -1, MOD_NONE };
+    // scan lines
+    for (uint8_t scan = 0; scan < sizeof(pinsScan) / sizeof(*pinsScan); scan++) {
+        digitalWrite(pinsScan[scan], HIGH);
+        delay(1);
+        for (uint8_t out = 0; out < sizeof(pinsOut) / sizeof(*pinsOut); out++) {
+            // skip shift and code keys
+
+            int status = digitalRead(pinsOut[out]);
+            if (status == HIGH) {
+                key = { scan, out, MOD_NONE };
+                break;
+            }
+        }
+        digitalWrite(pinsScan[scan], LOW);
+
+        if (key.scan != -1) break;
+    }
+
+    // TODO: Read mod key
+
+    if (key.scan == -1) return { 0, 0 };
+
+    return keymap.at(key);
+}
+
 int main(int argc, char** argv) {
     wiringPiSetupGpio();
 
-    int pinsScan[] = { 2, 3, 4, 17, 27, 22, 10, 9, 11 };
-    int pinsOut[] = { 18, 23, 24, 25, 8, 7, 12, 16 };
-
-    for (uint8_t i = 0; i < sizeof(pinsScan) / sizeof(*pinsScan); i++) pinMode(pinsScan[i], OUTPUT);
+    for (uint8_t i = 0; i < sizeof(pinsScan) / sizeof(*pinsScan); i++) {
+        pinMode(pinsScan[i], OUTPUT);
+        digitalWrite(pinsScan[i], LOW);
+    }
     for (uint8_t i = 0; i < sizeof(pinsOut) / sizeof(*pinsOut); i++) pinMode(pinsOut[i], INPUT);
 
     while (true) {
-        uint32_t codepoint = readCodepoint();
-        std::cout << "U+" << std::setfill('0') << std::setw(6) << std::right << std::hex << codepoint << std::endl;
+        auto key = readKey();
+        if (key.codepoint == 0 && key.key == 0) continue;
+        std::cout << "Key U+" << std::setfill('0') << std::setw(6) << std::right << std::hex << key.codepoint
+                  << " ASCII 0x" << std::setfill('0') << std::setw(2) << std::right << std::hex << key.key << std::endl;
     }
+
+    // while (true) {
+    //     uint32_t codepoint = readCodepoint();
+    //     std::cout << "U+" << std::setfill('0') << std::setw(6) << std::right << std::hex << codepoint << std::endl;
+    // }
 }
