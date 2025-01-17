@@ -112,7 +112,10 @@ int main(int argc, char** argv) {
         pinMode(pinsScan[i], OUTPUT);
         digitalWrite(pinsScan[i], LOW);
     }
-    for (uint8_t i = 0; i < sizeof(pinsOut) / sizeof(*pinsOut); i++) pinMode(pinsOut[i], INPUT);
+    for (uint8_t i = 0; i < sizeof(pinsOut) / sizeof(*pinsOut); i++) {
+        pinMode(pinsOut[i], INPUT);
+        pullUpDnControl(pinsOut[i], PUD_DOWN);
+    }
 
     while (true) {
         auto key = readKey();
