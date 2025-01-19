@@ -80,18 +80,18 @@ KeymapEntry readKey() {
     KeymapKey key = { -1, -1, MOD_NONE };
     // scan lines
     for (uint8_t scan = 0; scan < sizeof(pinsScan) / sizeof(*pinsScan); scan++) {
-        digitalWrite(pinsScan[scan], HIGH);
+        digitalWrite(pinsScan[scan], LOW);
         delay(1);
         for (uint8_t out = 0; out < sizeof(pinsOut) / sizeof(*pinsOut); out++) {
             // skip shift and code keys
 
             int status = digitalRead(pinsOut[out]);
-            if (status == HIGH) {
+            if (status == LOW) {
                 key = { scan, out, MOD_NONE };
                 break;
             }
         }
-        digitalWrite(pinsScan[scan], LOW);
+        digitalWrite(pinsScan[scan], HIGH);
 
         if (key.scan != -1) break;
     }
@@ -108,11 +108,11 @@ int main(int argc, char** argv) {
 
     for (uint8_t i = 0; i < sizeof(pinsScan) / sizeof(*pinsScan); i++) {
         pinMode(pinsScan[i], OUTPUT);
-        digitalWrite(pinsScan[i], LOW);
+        digitalWrite(pinsScan[i], HIGH);
     }
     for (uint8_t i = 0; i < sizeof(pinsOut) / sizeof(*pinsOut); i++) {
         pinMode(pinsOut[i], INPUT);
-        pullUpDnControl(pinsOut[i], PUD_DOWN);
+        pullUpDnControl(pinsOut[i], PUD_UP);
     }
 
     while (true) {
