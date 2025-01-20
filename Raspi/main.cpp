@@ -83,7 +83,7 @@ KeymapEntry readKey() {
         digitalWrite(pinsScan[scan], LOW);
         delay(1);
         for (uint8_t out = 0; out < sizeof(pinsOut) / sizeof(*pinsOut); out++) {
-            // skip shift and code keys
+            // TODO: skip shift and code keys
 
             int status = digitalRead(pinsOut[out]);
             if (status == LOW) {
@@ -117,10 +117,8 @@ int main(int argc, char** argv) {
 
     while (true) {
         auto key = readKey();
-        if (key.codepoint == 0 && key.key == 0) {
-            std::cout << "no input" << std::endl;
+        if (key.codepoint == 0 && key.key == 0)
             continue;
-        }
         std::cout << "Key U+" << std::setfill('0') << std::setw(6) << std::right << std::hex << key.codepoint
                   << " ASCII 0x" << std::setfill('0') << std::setw(2) << std::right << std::hex << key.key << std::endl;
     }
