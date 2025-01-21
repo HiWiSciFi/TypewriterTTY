@@ -103,25 +103,29 @@ KeymapEntry readKey() {
     return keymap.at(key);
 }
 
-#define PIN_SCAN 3
-
 int main(int argc, char** argv) {
     wiringPiSetupGpio();
 
-    pinMode(PIN_SCAN, OUTPUT);
+    for (int m = 0; m < (sizeof(pinsScan) / sizeof(*pinsScan)); m++) {
+        pinMode(pinsScan[m], OUTPUT);
+        digitalWrite(pinsScan[m], HIGH);
+    }
 
     for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
         pinMode(pinsOut[i], INPUT);
         pullUpDnControl(pinsOut[i], PUD_UP);
     }
 
-    digitalWrite(PIN_SCAN, LOW);
-
     while (true) {
-        for (int i = 1; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
-            if (digitalRead(pinsOut[i]) == LOW) {
-                std::cout << i << " pressed" << std::endl;
+        for (int m = 0; m < (sizeof(pinsScan) / sizeof(*pinsScan)); m++) {
+            digitalWrite(pinsScan[m], LOW);
+            delay(1);
+            for (int i = 1; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
+                if (digitalRead(pinsOut[i]) == LOW) {
+                    std::cout << m << ", " << i << " pressed" << std::endl;
+                }
             }
+            digitalWrite(pinsScan[m], HIGH);
         }
     }
 
