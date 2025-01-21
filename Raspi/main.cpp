@@ -103,25 +103,42 @@ KeymapEntry readKey() {
     return keymap.at(key);
 }
 
+#define PIN_SCAN 3
+#define PIN_OUT 8
+
 int main(int argc, char** argv) {
     wiringPiSetupGpio();
 
-    for (uint8_t i = 0; i < sizeof(pinsScan) / sizeof(*pinsScan); i++) {
-        pinMode(pinsScan[i], OUTPUT);
-        digitalWrite(pinsScan[i], HIGH);
-    }
-    for (uint8_t i = 0; i < sizeof(pinsOut) / sizeof(*pinsOut); i++) {
-        pinMode(pinsOut[i], INPUT);
-        pullUpDnControl(pinsOut[i], PUD_UP);
-    }
+    pinMode(PIN_SCAN, OUTPUT);
+    pinMode(PIN_OUT, INPUT);
+    pullUpDnControl(PIN_OUT, PUD_UP);
+
+    digitalWrite(PIN_SCAN, LOW);
 
     while (true) {
-        auto key = readKey();
-        if (key.codepoint == 0 && key.key == 0)
-            continue;
-        std::cout << "Key U+" << std::setfill('0') << std::setw(6) << std::right << std::hex << key.codepoint
-                  << " ASCII 0x" << std::setfill('0') << std::setw(2) << std::right << std::hex << static_cast<int>(key.key) << std::endl;
+        if (digitalRead(PIN_OUT) == LOW) {
+            std::cout << "a pressed" << std::endl;
+        } else {
+            std::cout << "no input" << std::endl;
+        }
     }
+
+    // for (uint8_t i = 0; i < sizeof(pinsScan) / sizeof(*pinsScan); i++) {
+    //     pinMode(pinsScan[i], OUTPUT);
+    //     digitalWrite(pinsScan[i], HIGH);
+    // }
+    // for (uint8_t i = 0; i < sizeof(pinsOut) / sizeof(*pinsOut); i++) {
+    //     pinMode(pinsOut[i], INPUT);
+    //     pullUpDnControl(pinsOut[i], PUD_UP);
+    // }
+
+    // while (true) {
+    //     auto key = readKey();
+    //     if (key.codepoint == 0 && key.key == 0)
+    //         continue;
+    //     std::cout << "Key U+" << std::setfill('0') << std::setw(6) << std::right << std::hex << key.codepoint
+    //               << " ASCII 0x" << std::setfill('0') << std::setw(2) << std::right << std::hex << static_cast<int>(key.key) << std::endl;
+    // }
 
     // while (true) {
     //     uint32_t codepoint = readCodepoint();
