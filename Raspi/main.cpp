@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
     digitalWrite(PIN_SCAN, LOW);
 
     while (true) {
-        for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
+        for (int i = 1; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
             if (digitalRead(pinsOut[i]) == LOW) {
                 std::cout << i << " pressed" << std::endl;
             }
