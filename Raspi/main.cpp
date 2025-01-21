@@ -104,22 +104,24 @@ KeymapEntry readKey() {
 }
 
 #define PIN_SCAN 3
-#define PIN_OUT 8
 
 int main(int argc, char** argv) {
     wiringPiSetupGpio();
 
     pinMode(PIN_SCAN, OUTPUT);
-    pinMode(PIN_OUT, INPUT);
-    pullUpDnControl(PIN_OUT, PUD_UP);
+
+    for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
+        pinMode(pinsOut[i], INPUT);
+        pullUpDnControl(pinsOut[i], PUD_UP);
+    }
 
     digitalWrite(PIN_SCAN, LOW);
 
     while (true) {
-        if (digitalRead(PIN_OUT) == LOW) {
-            std::cout << "a pressed" << std::endl;
-        } else {
-            std::cout << "no input" << std::endl;
+        for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
+            if (digitalRead(pinsOut[i]) == LOW) {
+                std::cout << i << " pressed" << std::endl;
+            }
         }
     }
 
