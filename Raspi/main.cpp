@@ -119,6 +119,7 @@ int main(int argc, char** argv) {
     while (true) {
         for (int m = 0; m < (sizeof(pinsScan) / sizeof(*pinsScan)); m++) {
             digitalWrite(pinsScan[m], LOW);
+            delay(1);
             for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
                 if (i == 0 && m == 1) continue;
                 if (digitalRead(pinsOut[i]) == LOW) {
