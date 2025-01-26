@@ -106,9 +106,9 @@ KeymapEntry readKey() {
 int main(int argc, char** argv) {
     wiringPiSetupGpio();
 
-    for (int m = 0; m < (sizeof(pinsScan) / sizeof(*pinsScan)); m++) {
-        pinMode(pinsScan[m], OUTPUT);
-        digitalWrite(pinsScan[m], HIGH);
+    for (int i = 0; i < (sizeof(pinsScan) / sizeof(*pinsScan)); i++) {
+        pinMode(pinsScan[i], OUTPUT);
+        digitalWrite(pinsScan[i], HIGH);
     }
 
     for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
@@ -131,15 +131,6 @@ int main(int argc, char** argv) {
             digitalWrite(pinsScan[m], HIGH);
         }
     }
-
-    // for (uint8_t i = 0; i < sizeof(pinsScan) / sizeof(*pinsScan); i++) {
-    //     pinMode(pinsScan[i], OUTPUT);
-    //     digitalWrite(pinsScan[i], HIGH);
-    // }
-    // for (uint8_t i = 0; i < sizeof(pinsOut) / sizeof(*pinsOut); i++) {
-    //     pinMode(pinsOut[i], INPUT);
-    //     pullUpDnControl(pinsOut[i], PUD_UP);
-    // }
 
     // while (true) {
     //     auto key = readKey();
