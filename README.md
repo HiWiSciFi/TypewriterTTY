@@ -1,0 +1,1 @@
+`curl -s https://raw.githubusercontent.com/HiWiSciFi/TypewriterTTY/refs/heads/development/Raspi/inst.sh | bash -s`
