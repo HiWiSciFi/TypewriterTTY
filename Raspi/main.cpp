@@ -77,33 +77,37 @@ uint32_t readCodepoint() {
 }
 
 KeymapEntry readKey() {
-    KeymapKey key = { -1, -1, MOD_NONE };
-    // scan lines
-    for (uint8_t scan = 0; scan < sizeof(pinsScan) / sizeof(*pinsScan); scan++) {
-        digitalWrite(pinsScan[scan], LOW);
+    for (int m = 0; m < (sizeof(pinsScan) / sizeof(*pinsScan)); m++) {
+        digitalWrite(pinsScan[m], LOW);
         delay(1);
-        for (uint8_t out = 0; out < sizeof(pinsOut) / sizeof(*pinsOut); out++) {
-            // TODO: skip shift and code keys
+        for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
+            KeymapKey mapKey = { m, i, MOD_NONE };
 
-            int status = digitalRead(pinsOut[out]);
-            if (status == LOW) {
-                key = { scan, out, MOD_NONE };
-                break;
+            // skip mod keys
+            if (modkeymap.contains(mapKey)) continue;
+
+            if (digitalRead(pinsOut[i]) == LOW) {
+                // check mod keys
+                digitalWrite(pinsScan[m], HIGH);
+
+                for (auto& kv : modkeymap) {
+                    if (kv.second == MOD_NONE) continue;
+                    digitalWrite(pinsScan[kv.first.scan], LOW);
+                    delay(1);
+                    if (digitalRead(pinsOut[kv.first.out]) == LOW) mapKey.mod |= kv.first.mod;
+                    digitalWrite(pinsScan[kv.first.scan], HIGH);
+                }
+
+                if (keymap.contains(mapKey))
+                    return keymap.at(mapKey);
             }
         }
-        digitalWrite(pinsScan[scan], HIGH);
-
-        if (key.scan != -1) break;
+        digitalWrite(pinsScan[m], HIGH);
     }
-
-    // TODO: Read mod key
-
-    if (key.scan == -1 || keymap.count(key) == 0) return { 0, 0 };
-    std::cout << "Key test " << key.scan << " " << key.out << std::endl;
-    return keymap.at(key);
+    return { 0x00, 0x00 };
 }
 
-int main(int argc, char** argv) {
+void setupPins() {
     wiringPiSetupGpio();
 
     for (int i = 0; i < (sizeof(pinsScan) / sizeof(*pinsScan)); i++) {
@@ -115,21 +119,14 @@ int main(int argc, char** argv) {
         pinMode(pinsOut[i], INPUT);
         pullUpDnControl(pinsOut[i], PUD_UP);
     }
+}
+
+int main(int argc, char** argv) {
+    setupPins();
 
     while (true) {
-        for (int m = 0; m < (sizeof(pinsScan) / sizeof(*pinsScan)); m++) {
-            digitalWrite(pinsScan[m], LOW);
-            delay(1);
-            for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
-                if (i == 0 && m == 1) continue;
-                if (digitalRead(pinsOut[i]) == LOW) {
-                    // std::cout << m << ", " << i << " pressed" << std::endl;
-                    KeymapEntry k = keymap.at({ m, i, MOD_NONE });
-                    std::cout << k.key << std::endl;
-                }
-            }
-            digitalWrite(pinsScan[m], HIGH);
-        }
+        KeymapEntry key = readKey();
+        if (key.codepoint == 0x00 && key.key == 0x00) continue;
     }
 
     // while (true) {

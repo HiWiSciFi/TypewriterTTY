@@ -19,14 +19,51 @@ struct KeymapKey {
     uint8_t mod;
 
     bool operator<(const KeymapKey& rhs) const {
-        return 
+        return
             (scan < rhs.scan)
             || (scan == rhs.scan && out < rhs.out)
             || (scan == rhs.scan && out == rhs.out && mod < rhs.mod);
     }
 };
 
+static std::map<KeymapKey, uint8_t> modkeymap = {
+    { { 8, 6, MOD_NONE }, MOD_SHIFT }, // SHIFT L R
+    { { 0, 3, MOD_NONE }, MOD_CODE  }, // CODE
+    { { 1, 0, MOD_NONE }, MOD_NONE  }, // Case Open
+};
+
 static std::map<KeymapKey, KeymapEntry> keymap = {
+    { { 7, 7, MOD_NONE  }, { 0x20, 0x20 } }, // SPACE
+    { { 2, 0, MOD_SHIFT }, { 0x21, 0x21 } }, // !
+    { { 2, 1, MOD_SHIFT }, { 0x22, 0x22 } }, // "
+    { { 6, 5, MOD_NONE  }, { 0x23, 0x23 } }, // #
+    { { 3, 1, MOD_SHIFT }, { 0x24, 0x24 } }, // $
+    { { 4, 0, MOD_SHIFT }, { 0x25, 0x25 } }, // %
+    { { 4, 1, MOD_SHIFT }, { 0x26, 0x26 } }, // &
+    { { 6, 5, MOD_SHIFT }, { 0x27, 0x27 } }, // '
+    { { 5, 1, MOD_SHIFT }, { 0x28, 0x28 } }, // (
+    { { 6, 0, MOD_SHIFT }, { 0x29, 0x29 } }, // )
+    { { 7, 3, MOD_SHIFT }, { 0x2A, 0x2A } }, // *
+    { { 7, 3, MOD_NONE  }, { 0x2B, 0x2B } }, // +
+    { { 4, 7, MOD_NONE  }, { 0x2C, 0x2C } }, // ,
+    { { 5, 7, MOD_NONE  }, { 0x2D, 0x2D } }, // -
+    { { 5, 6, MOD_NONE  }, { 0x2E, 0x2E } }, // .
+    { { 5, 0, MOD_SHIFT }, { 0x2F, 0x2F } }, // /
+    { { 6, 1, MOD_NONE  }, { 0x30, 0x30 } }, // 0
+    { { 2, 0, MOD_NONE  }, { 0x31, 0x31 } }, // 1
+    { { 2, 1, MOD_NONE  }, { 0x32, 0x32 } }, // 2
+    { { 3, 0, MOD_NONE  }, { 0x33, 0x33 } }, // 3
+    { { 3, 1, MOD_NONE  }, { 0x34, 0x34 } }, // 4
+    { { 4, 0, MOD_NONE  }, { 0x35, 0x35 } }, // 5
+    { { 4, 1, MOD_NONE  }, { 0x36, 0x36 } }, // 6
+    { { 5, 0, MOD_NONE  }, { 0x37, 0x37 } }, // 7
+    { { 5, 1, MOD_NONE  }, { 0x38, 0x38 } }, // 8
+    { { 6, 0, MOD_NONE  }, { 0x39, 0x39 } }, // 9
+    { { 5, 6, MOD_SHIFT }, { 0x3A, 0x3A } }, // :
+    { { 4, 7, MOD_SHIFT }, { 0x3B, 0x3B } }, // ;
+    { { 6, 1, MOD_SHIFT }, { 0x3D, 0x3D } }, // =
+    { { 9, 9, MOD_CODE  }, { 0x3E, 0x3E } }, // >
+    { { 6, 6, MOD_SHIFT }, { 0x3F, 0x3F } }, // ?
     { { 1, 4, MOD_SHIFT }, { 0x41, 0x41 } }, // A
     { { 3, 6, MOD_SHIFT }, { 0x42, 0x42 } }, // B
     { { 2, 6, MOD_SHIFT }, { 0x43, 0x43 } }, // C
@@ -81,6 +118,44 @@ static std::map<KeymapKey, KeymapEntry> keymap = {
     { { 1, 7, MOD_NONE  }, { 0x78, 0x78 } }, // x
     { { 1, 6, MOD_NONE  }, { 0x79, 0x79 } }, // y
     { { 4, 3, MOD_NONE  }, { 0x7A, 0x7A } }, // z
+
+    { { 7, 4, MOD_NONE  }, { 0x80, 0x80 } }, // CRLF
+    { { 0, 7, MOD_NONE  }, { 0x81, 0x81 } }, // WORD OUT
+
+    { { 0, 0, MOD_NONE  }, { 0x83, 0x83 } }, // Pitch
+    { { 0, 1, MOD_NONE  }, { 0x84, 0x84 } }, // Line
+    { { 0, 2, MOD_NONE  }, { 0x85, 0x85 } }, // LMAR
+    { { 0, 2, MOD_CODE  }, { 0x86, 0x86 } }, // RMAR
+    { { 0, 4, MOD_NONE  }, { 0x88, 0x88 } }, // T+
+    { { 0, 4, MOD_CODE  }, { 0x89, 0x89 } }, // T-
+    { { 0, 5, MOD_NONE  }, { 0x8A, 0x8A } }, // Caps Lock
+    { { 0, 7, MOD_CODE  }, { 0x8B, 0x8B } }, // LINE OUT
+    { { 1, 1, MOD_CODE  }, { 0x8C, 0x8C } }, // L IND Top
+    { { 1, 3, MOD_CODE  }, { 0x8D, 0x8D } }, // L IND Bot
+    { { 1, 1, MOD_NONE  }, { 0x8E, 0x8E } }, // Return L Top
+    { { 1, 3, MOD_NONE  }, { 0x8F, 0x8F } }, // Return L Bot
+    { { 6, 7, MOD_CODE  }, { 0x90, 0x90 } }, // DEL?
+    { { 7, 0, MOD_NONE  }, { 0x91, 0x91 } }, // <-||->
+    { { 7, 2, MOD_NONE  }, { 0x92, 0x92 } }, // RELOC
+    { { 7, 2, MOD_CODE  }, { 0x93, 0x93 } }, // |-<-|
+    { { 7, 5, MOD_NONE  }, { 0x94, 0x94 } }, // |<-|
+    { { 7, 5, MOD_CODE  }, { 0x95, 0x95 } }, // <<-
+    { { 7, 6, MOD_NONE  }, { 0x96, 0x96 } }, // INDEX
+    { { 7, 6, MOD_CODE  }, { 0x97, 0x97 } }, // REV
+
+    { { 3, 0, MOD_SHIFT }, { 0x99, 0x99 } }, // §
+    { { 7, 1, MOD_NONE  }, { 0x9A, 0x9A } }, // ´
+    { { 4, 2, MOD_CODE  }, { 0x9B, 0x9B } }, // µ
+    { { 1, 7, MOD_CODE  }, { 0x9C, 0x9C } }, // ²
+    { { 2, 7, MOD_CODE  }, { 0x9D, 0x9D } }, // ³
+    { { 2, 3, MOD_CODE  }, { 0x9E, 0x9E } }, // °
+    { { 6, 4, MOD_NONE  }, { 0x9F, 0x9F } }, // ä
+    { { 6, 4, MOD_SHIFT }, { 0xA0, 0xA0 } }, // Ä
+    { { 5, 5, MOD_NONE  }, { 0xA1, 0xA1 } }, // ö
+    { { 5, 5, MOD_SHIFT }, { 0xA2, 0xA2 } }, // Ö
+    { { 6, 2, MOD_NONE  }, { 0xA3, 0xA3 } }, // ü
+    { { 6, 2, MOD_SHIFT }, { 0xA4, 0xA4 } }, // Ü
+    { { 6, 6, MOD_NONE  }, { 0xA5, 0xA5 } }, // ß
 };
 
 #endif // __KEYMAP_HPP
