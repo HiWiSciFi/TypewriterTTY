@@ -94,7 +94,7 @@ KeymapEntry readKey() {
                     if (kv.second == MOD_NONE) continue;
                     digitalWrite(pinsScan[kv.first.scan], LOW);
                     delay(1);
-                    if (digitalRead(pinsOut[kv.first.out]) == LOW) mapKey.mod |= kv.first.mod;
+                    if (digitalRead(pinsOut[kv.first.out]) == LOW) mapKey.mod |= kv.second;
                     digitalWrite(pinsScan[kv.first.scan], HIGH);
                 }
 
@@ -127,6 +127,7 @@ int main(int argc, char** argv) {
     while (true) {
         KeymapEntry key = readKey();
         if (key.codepoint == 0x00 && key.key == 0x00) continue;
+        std::cout << static_cast<char>(key.codepoint) << std::endl;
     }
 
     // while (true) {
