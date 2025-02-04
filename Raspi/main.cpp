@@ -126,14 +126,11 @@ void setupPins() {
 int main(int argc, char** argv) {
     PseudoTTY pty(200, 1, { "/bin/bash" });
     pty.openTTY();
-    sleep(1);
+    sleep(1); // give bash time to start up
 
     setupPins();
 
-    constexpr uint8_t MIN_HOLD_TIME = 3;
-
     KeymapEntry lastKey = { 0x00, 0x00 };
-    uint8_t holdTime = 0;
     while (true) {
         std::string ptyContent = pty.readTTY();
         std::cout << ptyContent << std::flush;
