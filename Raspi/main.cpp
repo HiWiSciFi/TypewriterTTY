@@ -1,10 +1,12 @@
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <unistd.h>
 
 #include <wiringPi.h>
 
 #include "Keymap.hpp"
+#include "PseudoTTY.hpp"
 
 // +-----+-----+---------+------+---+Pi Zero 2W+---+------+---------+-----+-----+
 // | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
@@ -122,24 +124,29 @@ void setupPins() {
 }
 
 int main(int argc, char** argv) {
+    PseudoTTY pty(200, 1, { "/bin/bash" });
+    pty.openTTY();
+    sleep(1);
+
     setupPins();
 
+    constexpr uint8_t MIN_HOLD_TIME = 3;
+
+    KeymapEntry lastKey = { 0x00, 0x00 };
+    uint8_t holdTime = 0;
     while (true) {
+        std::string ptyContent = pty.readTTY();
+        std::cout << ptyContent << std::flush;
+
         KeymapEntry key = readKey();
-        if (key.codepoint == 0x00 && key.key == 0x00) continue;
-        std::cout << static_cast<char>(key.codepoint) << std::endl;
+
+        // not if same key
+        if (key == lastKey) continue;
+        lastKey = key;
+        // not if no key
+        if (key == KeymapEntry{ 0x00, 0x00 }) continue;
+
+        // std::cout << static_cast<char>(key.codepoint) << std::flush;
+        pty.writeTTY(static_cast<char>(key.codepoint));
     }
-
-    // while (true) {
-    //     auto key = readKey();
-    //     if (key.codepoint == 0 && key.key == 0)
-    //         continue;
-    //     std::cout << "Key U+" << std::setfill('0') << std::setw(6) << std::right << std::hex << key.codepoint
-    //               << " ASCII 0x" << std::setfill('0') << std::setw(2) << std::right << std::hex << static_cast<int>(key.key) << std::endl;
-    // }
-
-    // while (true) {
-    //     uint32_t codepoint = readCodepoint();
-    //     std::cout << "U+" << std::setfill('0') << std::setw(6) << std::right << std::hex << codepoint << std::endl;
-    // }
 }

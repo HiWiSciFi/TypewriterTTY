@@ -11,6 +11,11 @@
 struct KeymapEntry {
     uint32_t codepoint;
     uint8_t key;
+
+    inline bool operator==(const KeymapEntry& ke) const {
+        return ke.codepoint == this->codepoint
+            && ke.key == this->key;
+    }
 };
 
 struct KeymapKey {
@@ -119,7 +124,7 @@ static std::map<KeymapKey, KeymapEntry> keymap = {
     { { 1, 6, MOD_NONE  }, { 0x79, 0x79 } }, // y
     { { 4, 3, MOD_NONE  }, { 0x7A, 0x7A } }, // z
 
-    { { 7, 4, MOD_NONE  }, { 0x80, 0x80 } }, // CRLF
+    { { 7, 4, MOD_NONE  }, { 0x0A, 0x0A } }, // CRLF // !!!!!!!!!!!!!!TEMP!!!!!!!!!!!!!!!! actual line: { { 7, 4, MOD_NONE  }, { 0x80, 0x80 } },
     { { 0, 7, MOD_NONE  }, { 0x81, 0x81 } }, // WORD OUT
 
     { { 0, 0, MOD_NONE  }, { 0x83, 0x83 } }, // Pitch

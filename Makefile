@@ -1,6 +1,6 @@
 arduino_env := mega
 
-raspi_sources := Raspi/main.cpp Raspi/Keymap.hpp
+raspi_sources := Raspi/main.cpp Raspi/Keymap.hpp Raspi/PseudoTTY.cpp Raspi/PseudoTTY.hpp
 
 raspi_cpp_std := c++20
 raspi_out := typewriter
