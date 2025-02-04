@@ -3,73 +3,138 @@
 #include <pty.h>
 #include <unistd.h>
 
-#include <utmp.h>
+#include <sys/wait.h>
+#include <cstring>
+#include <sstream>
+#include <vector>
 
-int runSingle();
-int runFork();
+class PseudoTTY {
+private:
+    int master = -1;
+    pid_t childPid = -1;
+    winsize winp;
+    std::vector<std::string> args;
+
+    static void throwErrno();
+
+public:
+    // throws: std::runtime_error
+    PseudoTTY(unsigned short columns, unsigned short rows, const std::vector<std::string>& args);
+
+    ~PseudoTTY();
+
+    // throws: std::runtime_error
+    void writeTTY(const std::string& msg);
+
+    // throws: std::runtime_error
+    std::string readTTY();
+
+    // throws: std::runtime_error
+    void openTTY();
+};
+
+void PseudoTTY::throwErrno() {
+    error_t e = errno;
+    errno = 0;
+    std::string msg = std::string(strerror(errno));
+    if (errno != 0) {
+        msg = "failed to retrieve error string. Original error: ";
+        msg += e;
+    }
+    throw std::runtime_error(msg);
+}
+
+PseudoTTY::PseudoTTY(unsigned short columns, unsigned short rows, const std::vector<std::string>& args) {
+    this->winp = {
+        .ws_row = rows,
+        .ws_col = columns,
+        .ws_xpixel = 0,
+        .ws_ypixel = 0
+    };
+    this->args = args;
+}
+
+void PseudoTTY::openTTY() {
+    this->childPid = forkpty(&this->master, NULL, NULL, &this->winp);
+
+    if (this->childPid == -1)
+        this->throwErrno();
+
+    if (this->childPid == 0) {
+        // child process
+        std::vector<char*> bargv;
+        bargv.reserve(this->args.size() + 1);
+        for (const auto& str : this->args) {
+            bargv.push_back(const_cast<char*>(str.c_str()));
+        }
+        bargv.push_back(nullptr);
+        execv(bargv[0], bargv.data());
+        
+        // TODO: error handling
+        // TODO: handle closed terminal
+        return;
+    }
+
+    // set fd mode to non-blocking read
+    if (fcntl(this->master, F_SETFL, O_NONBLOCK) == -1)
+        this->throwErrno();
+}
+
+PseudoTTY::~PseudoTTY() {
+    if (this->childPid != -1 && this->childPid != 0) {
+        if (this->master != -1)
+            if (close(this->master) == -1) perror("error closing pty master");
+        if (kill(this->childPid, SIGKILL) == -1) perror("failed to kill child process");
+        waitpid(this->childPid, NULL, 0);
+    }
+}
+
+void PseudoTTY::writeTTY(const std::string& msg) {
+    if (write(this->master, msg.c_str(), msg.length()) == -1)
+        this->throwErrno();
+}
+
+std::string PseudoTTY::readTTY() {
+    int bcount = -1;
+    char buf[128];
+
+    std::stringstream ss;
+
+    while ((bcount = read(this->master, buf, sizeof(buf) - 1)) > 0) {
+        buf[bcount] = '\0';
+        ss << buf;
+    }
+
+    if (bcount == -1 && errno != EWOULDBLOCK) this->throwErrno();
+
+    return ss.str();
+}
 
 int main(int argc, char** argv) {
-    return runFork();
-}
+    try {
+        PseudoTTY pty(500, 1, { "/bin/bash" });
+        pty.openTTY();
+        sleep(1); // give bash time to start
 
-int runSingle() {
-    int master, slave;
-    if (openpty(&master, &slave, NULL, NULL, NULL) == -1) {
-        perror("ERROR: openpty");
-        return -1;
-    }
+        std::cout << pty.readTTY() << std::flush;
 
-    if (login_tty(slave) == -1) {
-        perror("ERROR: login_tty");
-        return -1;
-    }
-    return 0;
-}
-
-int runFork() {
-    int master;
-    // TODO: populate terminal and window options
-    termios termp = { };
-    winsize winp = {
-        .ws_row = 1,
-        .ws_col = 200,
-        .ws_xpixel = 1,
-        .ws_ypixel = 200
-    };
-    pid_t childPid = forkpty(&master, NULL, NULL, &winp);
-
-    if (childPid == -1) {
-        perror("ERROR: forkpty");
-        return -1;
-    }
-
-    if (childPid == 0) {
-        // start slave pty
-        while (true) execl("/bin/bash", "bash", NULL);
-        return 0;
-    }
-
-    // set fd mode to non blocking read
-    if (fcntl(master, F_SETFL, O_NONBLOCK) == -1) {
-        perror("ERROR: fcntl");
-        return -1;
-    }
-
-    // start master pty
-    int count = 0;
-    while (true) {
-        if (write(master, "ls -la\n", 7) == -1) perror("ERROR: write");
-        sleep(1);
-
-        int nb_read = -1;
-        char buf[128];
-
-        while ((nb_read = read(master, buf, sizeof(buf) - 1)) > 0) {
-            buf[nb_read] = '\0';
-            std::cout << buf << std::flush;
+        while (true) {
+            try {
+                sleep(1);
+                pty.writeTTY("ls");
+                std::cout << pty.readTTY() << std::flush;
+                sleep(1);
+                pty.writeTTY(" -la");
+                std::cout << pty.readTTY() << std::flush;
+                sleep(2);
+                pty.writeTTY("\n");
+                // TODO: read keyboard and write to pty
+                std::cout << pty.readTTY() << std::flush;
+            } catch (std::runtime_error e) {
+                std::cerr << "ERROR: " << e.what() << std::endl;
+            }
         }
-
-        if (nb_read == -1 && errno != EWOULDBLOCK) perror("ERROR: read");
+    } catch (std::runtime_error e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
     }
-    return 0;
 }
