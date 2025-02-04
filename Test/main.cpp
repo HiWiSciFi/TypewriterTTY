@@ -5,6 +5,9 @@
 
 #include <utmp.h>
 
+int runSingle();
+int runFork();
+
 int main(int argc, char** argv) {
     return runFork();
 }
@@ -20,6 +23,7 @@ int runSingle() {
         perror("ERROR: login_tty");
         return -1;
     }
+    return 0;
 }
 
 int runFork() {
