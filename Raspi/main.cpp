@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     try {
         Keyboard keyboard(pinsScan, pinsOut);
 
-        Printer printer("/dev/ttyUSB0", 9600);
+        Printer printer("/dev/ttyUSB0", 921600);
 
         PseudoTTY pty(200, 1, { "/bin/bash" });
         pty.openTTY();
