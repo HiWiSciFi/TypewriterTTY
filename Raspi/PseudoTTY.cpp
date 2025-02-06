@@ -1,5 +1,6 @@
 #include "PseudoTTY.hpp"
 
+#include <cstdint>
 #include <cstring>
 #include <fcntl.h>
 #include <pty.h>
@@ -54,7 +55,7 @@ void PseudoTTY::openTTY() {
         }
         bargv.push_back(nullptr);
         execv(bargv[0], bargv.data());
-        
+
         // TODO: error handling
         // TODO: handle closed terminal
         return;
@@ -89,4 +90,48 @@ std::string PseudoTTY::readTTY() {
     if (bcount == -1 && errno != EWOULDBLOCK) this->throwErrno();
 
     return ss.str();
+}
+
+uint32_t PseudoTTY::readCodepointTTY() {
+    uint8_t buf[4];
+    uint32_t codepoint = 0;
+
+    if (read(this->master, buf, 1) == -1) {
+        if (errno == EWOULDBLOCK) return codepoint;
+        this->throwErrno();
+    }
+
+    uint8_t size = 0;
+    if ((buf[0] & 0b1000'0000) == 0b0000'0000)
+        size = 0;
+    else if ((buf[0] & 0b1110'0000) == 0b1100'0000)
+        size = 1;
+    else if ((buf[0] & 0b1111'0000) == 0b1110'0000)
+        size = 2;
+    else if ((buf[0] & 0b1111'1000) == 0b1111'0000)
+        size = 3;
+    else {
+        throw std::runtime_error("invalid UTF-8 Byte");
+    }
+
+    static uint8_t fbMasks[] = { 0b0111'1111, 0b0001'1111, 0b0000'1111, 0b0000'0111 };
+    uint8_t fbMask = fbMasks[size];
+
+    // codepoint = (buf[0] & fbMask) << (size * 6);
+    codepoint = buf[0] & fbMask;
+
+    if (read(this->master, &buf[1], size) == -1) {
+        if (errno == EWOULDBLOCK) throw std::runtime_error("Unexpected end of stream");
+        this->throwErrno();
+    }
+
+    for (int8_t i = 0; i < size; i++) {
+        if ((buf[i] & 0b1100'0000) != 0b1000'0000)
+            throw std::runtime_error("invalid UTF-8 Byte");
+
+        codepoint = codepoint << 6;
+        codepoint |= buf[i] & 0b0011'1111;
+    }
+
+    return codepoint;
 }

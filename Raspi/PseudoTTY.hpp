@@ -30,6 +30,9 @@ public:
     std::string readTTY();
 
     // throws: std::runtime_error
+    uint32_t readCodepointTTY();
+
+    // throws: std::runtime_error
     void openTTY();
 };
 

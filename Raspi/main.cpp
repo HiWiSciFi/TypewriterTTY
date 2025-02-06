@@ -1,11 +1,7 @@
-#include <cstdint>
-#include <iomanip>
 #include <iostream>
 #include <unistd.h>
 
-#include <wiringPi.h>
-
-#include "Keymap.hpp"
+#include "Keyboard.hpp"
 #include "PseudoTTY.hpp"
 
 // +-----+-----+---------+------+---+Pi Zero 2W+---+------+---------+-----+-----+
@@ -35,107 +31,22 @@
 // | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
 // +-----+-----+---------+------+---+Pi Zero 2W+---+------+---------+-----+-----+
 
-int pinsScan[] = { 2, 3, 4, 17, 27, 22, 10, 9, 11 };
-int pinsOut[] = { 18, 23, 24, 25, 8, 7, 12, 16 };
-
-uint32_t readCodepoint() {
-    int c = fgetc(stdin);
-    if (c == EOF) {
-        // TODO: fgetc error
-    }
-
-    uint8_t size = 0;
-    if ((c & 0b1000'0000) == 0b0000'0000)
-        size = 0;
-    else if ((c & 0b1110'0000) == 0b1100'0000)
-        size = 1;
-    else if ((c & 0b1111'0000) == 0b1110'0000)
-        size = 2;
-    else if ((c & 0b1111'1000) == 0b1111'0000)
-        size = 3;
-    else {
-        // TODO: error, unexpected byte
-    }
-
-    static uint8_t masks[] = { 0b0111'1111, 0b0001'1111, 0b0000'1111, 0b0000'0111 };
-    uint8_t mask = masks[size];
-
-    uint32_t codepoint = (c & mask) << (size * 6);
-
-    for (int8_t off = size - 1; off >= 0; off--) {
-        c = fgetc(stdin);
-        if (c == EOF) {
-            // TODO: fgetc error
-        }
-
-        if ((c & 0b1100'0000) != 0b1000'0000) {
-            // TODO: error, unexpected byte
-        }
-
-        codepoint |= c << (off * 6);
-    }
-
-    return codepoint;
-}
-
-KeymapEntry readKey() {
-    for (int m = 0; m < (sizeof(pinsScan) / sizeof(*pinsScan)); m++) {
-        digitalWrite(pinsScan[m], LOW);
-        delay(1);
-        for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
-            KeymapKey mapKey = { m, i, MOD_NONE };
-
-            // skip mod keys
-            if (modkeymap.contains(mapKey)) continue;
-
-            if (digitalRead(pinsOut[i]) == LOW) {
-                // check mod keys
-                digitalWrite(pinsScan[m], HIGH);
-
-                for (auto& kv : modkeymap) {
-                    if (kv.second == MOD_NONE) continue;
-                    digitalWrite(pinsScan[kv.first.scan], LOW);
-                    delay(1);
-                    if (digitalRead(pinsOut[kv.first.out]) == LOW) mapKey.mod |= kv.second;
-                    digitalWrite(pinsScan[kv.first.scan], HIGH);
-                }
-
-                if (keymap.contains(mapKey))
-                    return keymap.at(mapKey);
-            }
-        }
-        digitalWrite(pinsScan[m], HIGH);
-    }
-    return { 0x00, 0x00 };
-}
-
-void setupPins() {
-    wiringPiSetupGpio();
-
-    for (int i = 0; i < (sizeof(pinsScan) / sizeof(*pinsScan)); i++) {
-        pinMode(pinsScan[i], OUTPUT);
-        digitalWrite(pinsScan[i], HIGH);
-    }
-
-    for (int i = 0; i < (sizeof(pinsOut) / sizeof(*pinsOut)); i++) {
-        pinMode(pinsOut[i], INPUT);
-        pullUpDnControl(pinsOut[i], PUD_UP);
-    }
-}
-
 int main(int argc, char** argv) {
+    static const std::vector<int> pinsScan = { 2, 3, 4, 17, 27, 22, 10, 9, 11 };
+    static const std::vector<int> pinsOut = { 18, 23, 24, 25, 8, 7, 12, 16 };
+
+    Keyboard keyboard(pinsScan, pinsOut);
+
     PseudoTTY pty(200, 1, { "/bin/bash" });
     pty.openTTY();
     sleep(1); // give bash time to start up
-
-    setupPins();
 
     KeymapEntry lastKey = { 0x00, 0x00 };
     while (true) {
         std::string ptyContent = pty.readTTY();
         std::cout << ptyContent << std::flush;
 
-        KeymapEntry key = readKey();
+        KeymapEntry key = keyboard.readKey();
 
         // not if same key
         if (key == lastKey) continue;
