@@ -38,6 +38,8 @@ static std::map<KeymapKey, uint8_t> modkeymap = {
 };
 
 static std::map<KeymapKey, KeymapEntry> keymap = {
+    { { 6, 7, MOD_NONE  }, { 0x08, 0x08 } }, // Backspace
+
     { { 7, 7, MOD_NONE  }, { 0x20, 0x20 } }, // SPACE
     { { 2, 0, MOD_SHIFT }, { 0x21, 0x21 } }, // !
     { { 2, 1, MOD_SHIFT }, { 0x22, 0x22 } }, // "
@@ -139,7 +141,7 @@ static std::map<KeymapKey, KeymapEntry> keymap = {
     { { 1, 3, MOD_CODE  }, { 0x8D, 0x8D } }, // L IND Bot
     { { 1, 1, MOD_NONE  }, { 0x8E, 0x8E } }, // Return L Top
     { { 1, 3, MOD_NONE  }, { 0x8F, 0x8F } }, // Return L Bot
-    { { 6, 7, MOD_CODE  }, { 0x90, 0x90 } }, // DEL?
+    { { 6, 7, MOD_CODE  }, { 0x90, 0x90 } }, // Backspace
     { { 7, 0, MOD_NONE  }, { 0x91, 0x91 } }, // <-||->
     { { 7, 2, MOD_NONE  }, { 0x92, 0x92 } }, // RELOC
     { { 7, 2, MOD_CODE  }, { 0x93, 0x93 } }, // |-<-|

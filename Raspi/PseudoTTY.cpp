@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstring>
 #include <fcntl.h>
+#include <poll.h>
 #include <pty.h>
 #include <signal.h>
 #include <sstream>
@@ -38,6 +39,16 @@ PseudoTTY::~PseudoTTY() {
         if (kill(this->childPid, SIGKILL) == -1) perror("failed to kill child process");
         waitpid(this->childPid, NULL, 0);
     }
+}
+
+bool PseudoTTY::dataAvailable() {
+    pollfd pfd = {
+        .fd = this->master,
+        .events = POLLIN,
+        .revents = 0
+    };
+    if (poll(&pfd, 1, 0) == -1) this->throwErrno();
+    return (pfd.revents & POLLIN) > 0;
 }
 
 void PseudoTTY::openTTY() {

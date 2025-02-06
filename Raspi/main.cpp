@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 #include "Keyboard.hpp"
+#include "Printer.hpp"
 #include "PseudoTTY.hpp"
 
 // +-----+-----+---------+------+---+Pi Zero 2W+---+------+---------+-----+-----+
@@ -35,26 +36,46 @@ int main(int argc, char** argv) {
     static const std::vector<int> pinsScan = { 2, 3, 4, 17, 27, 22, 10, 9, 11 };
     static const std::vector<int> pinsOut = { 18, 23, 24, 25, 8, 7, 12, 16 };
 
-    Keyboard keyboard(pinsScan, pinsOut);
+    try {
+        Keyboard keyboard(pinsScan, pinsOut);
 
-    PseudoTTY pty(200, 1, { "/bin/bash" });
-    pty.openTTY();
-    sleep(1); // give bash time to start up
+        Printer printer("/dev/ttyUSB0", 9600);
 
-    KeymapEntry lastKey = { 0x00, 0x00 };
-    while (true) {
-        std::string ptyContent = pty.readTTY();
-        std::cout << ptyContent << std::flush;
+        PseudoTTY pty(200, 1, { "/bin/bash" });
+        pty.openTTY();
+        sleep(1); // give bash time to start up
 
-        KeymapEntry key = keyboard.readKey();
+        KeymapEntry lastKey = { 0x00, 0x00 };
+        while (true) {
+            try {
+                while (pty.dataAvailable()) {
+                    uint32_t codepoint = pty.readCodepointTTY();
+                    if (codepoint != 0x00) printer.print(codepoint);
+                }
+            }
+            catch (std::runtime_error e) {
+                std::cerr << "ERROR: " << e.what() << std::endl;
+            }
 
-        // not if same key
-        if (key == lastKey) continue;
-        lastKey = key;
-        // not if no key
-        if (key == KeymapEntry{ 0x00, 0x00 }) continue;
+            try {
+                KeymapEntry key = keyboard.readKey();
 
-        // std::cout << static_cast<char>(key.codepoint) << std::flush;
-        pty.writeTTY(static_cast<char>(key.codepoint));
+                // not if same key
+                if (key == lastKey) continue;
+                lastKey = key;
+                // not if no key
+                if (key == KeymapEntry{ 0x00, 0x00 }) continue;
+
+                // std::cout << static_cast<char>(key.codepoint) << std::flush;
+                pty.writeTTY(static_cast<char>(key.codepoint));
+            }
+            catch (std::runtime_error e) {
+                std::cerr << "ERROR: " << e.what() << std::endl;
+            }
+        }
+    }
+    catch (std::runtime_error e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
+        exit(1);
     }
 }

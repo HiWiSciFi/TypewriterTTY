@@ -1,6 +1,7 @@
 #ifndef __PSEUDOTTY_HPP
 #define __PSEUDOTTY_HPP
 
+#include <cstdint>
 #include <string>
 #include <sys/ioctl.h>
 #include <vector>
@@ -19,6 +20,8 @@ public:
     PseudoTTY(unsigned short columns, unsigned short rows, const std::vector<std::string>& args);
 
     ~PseudoTTY();
+
+    bool dataAvailable();
 
     // throws: std::runtime_error
     void writeTTY(const std::string& msg);
