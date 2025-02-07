@@ -32,16 +32,29 @@
 // | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
 // +-----+-----+---------+------+---+Pi Zero 2W+---+------+---------+-----+-----+
 
+#include <cstring>
 int main(int argc, char** argv) {
     // I/O pins for keyboard scanning
     static const std::vector<int> pinsScan = { 2, 3, 4, 17, 27, 22, 10, 9, 11 };
     static const std::vector<int> pinsOut = { 18, 23, 24, 25, 8, 7, 12, 16 };
 
+    // set environment variables
+    std::vector<char*> myenv;
+    int envCount = 0;
+    for (; environ[envCount] != nullptr; envCount++);
+    myenv.reserve(envCount + 2); // counted envs + potential TERM + nullptr (appended in PTY constructor)
+    for (int i = 0; environ[i] != nullptr; i++) {
+        if (strlen(environ[i]) >= 5 && strncmp(environ[i], "TERM=", 5) == 0)
+            continue;
+        myenv.push_back(environ[i]);
+    }
+    myenv.push_back(const_cast<char*>("TERM=vanilla"));
+
     try {
         // initialize handlers
         Keyboard keyboard(pinsScan, pinsOut);
-        Printer printer("/dev/ttyUSB0", 921600);
-        PseudoTTY pty(200, 1, { "/bin/bash" });
+        Printer printer("/dev/ttyACM0", 921600);
+        PseudoTTY pty(200, 1, { "/bin/bash" }, myenv);
         pty.openTTY();
         sleep(1); // give bash time to start up
 

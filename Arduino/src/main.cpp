@@ -7,8 +7,8 @@ uint8_t outPorts[8] = { 21, 20, 19, 18, 17, 16, 15, 14 };
 // uint8_t scanPorts[9] = { 45, 46, 47, 48, 49, 50, 51, 52, 53 };
 // uint8_t outPorts[8] = { 34, 35, 36, 37, 38, 39, 40, 41 };
 
-#define ASCII_ACK 0x06
-#define ASCII_NAK 0x15
+static constexpr char ASCII_ACK = 0x06;
+static constexpr char ASCII_NAK = 0x15;
 
 #define ASIZE(arr) (sizeof( arr ) / sizeof( arr[0] ))
 
@@ -27,8 +27,7 @@ void setup() {
 void loop() {
 	while (Serial.available() > 0) {
 		uint8_t c = (uint8_t)Serial.read();
-		Serial.print(ASCII_ACK);
-		writeKey(c);
+		Serial.print(writeKey(c) == 0 ? ASCII_ACK : ASCII_NAK);
 	}
 
 	// writeKey(KEY_RETURN);

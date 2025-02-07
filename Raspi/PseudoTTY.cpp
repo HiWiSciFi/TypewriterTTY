@@ -22,7 +22,7 @@ void PseudoTTY::throwErrno() {
     throw std::runtime_error(msg);
 }
 
-PseudoTTY::PseudoTTY(unsigned short columns, unsigned short rows, const std::vector<std::string>& args) {
+PseudoTTY::PseudoTTY(unsigned short columns, unsigned short rows, const std::vector<std::string>& args, const std::vector<char*>& env) {
     this->winp = {
         .ws_row = rows,
         .ws_col = columns,
@@ -30,6 +30,8 @@ PseudoTTY::PseudoTTY(unsigned short columns, unsigned short rows, const std::vec
         .ws_ypixel = 0
     };
     this->args = args;
+    this->env = env;
+    this->env.push_back(nullptr);
 }
 
 PseudoTTY::~PseudoTTY() {
@@ -65,7 +67,11 @@ void PseudoTTY::openTTY() {
             bargv.push_back(const_cast<char*>(str.c_str()));
         }
         bargv.push_back(nullptr);
-        execv(bargv[0], bargv.data());
+
+        // if environment variables were passed use them, default otherwise
+        char** benv = this->env.size() > 1 ? this->env.data() : environ;
+
+        execvpe(bargv[0], bargv.data(), benv);
 
         // TODO: error handling
         // TODO: handle closed terminal

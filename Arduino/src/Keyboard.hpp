@@ -3,6 +3,7 @@
 
 #include "Keymap.hpp"
 
-void writeKey(uint16_t keycode);
+// returns 0 on success, -1 on error
+int writeKey(uint8_t keycode);
 
 #endif // __KEYBOARD_HPP

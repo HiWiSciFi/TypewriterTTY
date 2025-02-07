@@ -1,4 +1,4 @@
-#include <Keyboard.hpp>
+#include "Keyboard.hpp"
 
 #include <Arduino.h>
 
@@ -17,8 +17,12 @@ static void outputKey(uint8_t scan, uint8_t out) {
 	digitalWrite(outPorts[out], HIGH);
 }
 
-void writeKey(uint16_t keycode) {
+int writeKey(uint8_t keycode) {
+	if (keycode > (sizeof( keymap ) / sizeof( keymap[0] ))) return -1;
 	KeymapEntry key = keymap[keycode];
+	if (!key.valid) return -1;
+
+	// return 0; // TODO: remove
 
 	if (key.mod & MOD_SHIFT) outputKey(8, 6);
 	if (key.mod & MOD_CODE) outputKey(0, 3);
@@ -34,4 +38,6 @@ void writeKey(uint16_t keycode) {
 		waitForEdge(key.scan, RISING);
 		waitForEdge(key.scan, FALLING);
 	}
+
+	return 0;
 }

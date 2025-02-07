@@ -12,12 +12,13 @@ private:
     pid_t childPid = -1;
     winsize winp;
     std::vector<std::string> args;
+    std::vector<char*> env;
 
     static void throwErrno();
 
 public:
     // throws: std::runtime_error
-    PseudoTTY(unsigned short columns, unsigned short rows, const std::vector<std::string>& args);
+    PseudoTTY(unsigned short columns, unsigned short rows, const std::vector<std::string>& args, const std::vector<char*>& env);
 
     ~PseudoTTY();
 
