@@ -11,50 +11,22 @@ static void waitForEdge(uint8_t scan, uint8_t state) {
 }
 
 static void outputKey(uint8_t scan, uint8_t out) {
-
+	waitForEdge(scan, FALLING);
+	digitalWrite(outPorts[out], LOW);
+	waitForEdge(scan, RISING);
+	digitalWrite(outPorts[out], HIGH);
 }
 
 void writeKey(uint16_t keycode) {
 	KeymapEntry key = keymap[keycode];
 
-	// Serial.print("Writing scan ");
-	// Serial.print(key.scan);
-	// Serial.print(" out ");
-	// Serial.println(key.out);
-
-	if (key.mod & MOD_SHIFT) {
-		waitForEdge(8, FALLING);
-		digitalWrite(outPorts[6], LOW);
-		waitForEdge(8, RISING);
-		digitalWrite(outPorts[6], HIGH);
-	}
-
-	if (key.mod & MOD_CODE) {
-		waitForEdge(0, FALLING);
-		digitalWrite(outPorts[3], LOW);
-		waitForEdge(0, RISING);
-		digitalWrite(outPorts[3], HIGH);
-	}
+	if (key.mod & MOD_SHIFT) outputKey(8, 6);
+	if (key.mod & MOD_CODE) outputKey(0, 3);
 
 	for (int i = 0; i < 3; i++) {
-		waitForEdge(key.scan, FALLING);
-		digitalWrite(outPorts[key.out], LOW);
-		waitForEdge(key.scan, RISING);
-		digitalWrite(outPorts[key.out], HIGH);
-
-		if (key.mod & MOD_SHIFT) {
-			waitForEdge(8, FALLING);
-			digitalWrite(outPorts[6], LOW);
-			waitForEdge(8, RISING);
-			digitalWrite(outPorts[6], HIGH);
-		}
-
-		if (key.mod & MOD_CODE) {
-			waitForEdge(0, FALLING);
-			digitalWrite(outPorts[3], LOW);
-			waitForEdge(0, RISING);
-			digitalWrite(outPorts[3], HIGH);
-		}
+		outputKey(key.scan, key.out);
+		if (key.mod & MOD_SHIFT) outputKey(8, 6);
+		if (key.mod & MOD_CODE) outputKey(0, 3);
 	}
 
 	waitForEdge(key.scan, FALLING);
