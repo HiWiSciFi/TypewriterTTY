@@ -56,7 +56,7 @@ static const std::map<uint32_t, const char8_t*> unicodeMap = {
     { 0x0000'003D, u8"=" },
     { 0x0000'003E, u8">" },
     { 0x0000'003F, u8"?" },
-
+    
     { 0x0000'0041, u8"A" },
     { 0x0000'0042, u8"B" },
     { 0x0000'0043, u8"C" },
@@ -128,6 +128,8 @@ static const std::map<uint32_t, const char8_t*> unicodeMap = {
     { 0x0000'00FC, u8"\xA3" }, // ü
     { 0x0000'00DC, u8"\xA4" }, // Ü
     { 0x0000'00DF, u8"\xA5" }, // ß
+
+    { 0x0000'0040, u8"Oa" }, // @
 };
 
 #endif // __PRINTER_HPP

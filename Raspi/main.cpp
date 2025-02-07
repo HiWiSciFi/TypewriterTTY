@@ -35,8 +35,8 @@
 #include <cstring>
 int main(int argc, char** argv) {
     // I/O pins for keyboard scanning
-    static const std::vector<int> pinsScan = { 2, 3, 4, 17, 27, 22, 10, 9, 11 };
-    static const std::vector<int> pinsOut = { 18, 23, 24, 25, 8, 7, 12, 16 };
+    static const std::vector<int> pinsScan = { 10, 9, 11, 0, 5, 6, 13, 19, 26 };
+    static const std::vector<int> pinsOut = { 25, 8, 7, 1, 12, 16, 20, 21 };
 
     // set environment variables
     std::vector<char*> myenv;
