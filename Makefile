@@ -1,4 +1,4 @@
-arduino_env := mega
+arduino_env := nanoevery
 
 raspi_sources := Raspi/main.cpp Raspi/PseudoTTY.cpp Raspi/PseudoTTY.hpp Raspi/Keyboard.cpp Raspi/Keyboard.hpp Raspi/Printer.cpp Raspi/Printer.hpp
 
