@@ -33,21 +33,25 @@
 // +-----+-----+---------+------+---+Pi Zero 2W+---+------+---------+-----+-----+
 
 int main(int argc, char** argv) {
+    // I/O pins for keyboard scanning
     static const std::vector<int> pinsScan = { 2, 3, 4, 17, 27, 22, 10, 9, 11 };
     static const std::vector<int> pinsOut = { 18, 23, 24, 25, 8, 7, 12, 16 };
 
     try {
+        // initialize handlers
         Keyboard keyboard(pinsScan, pinsOut);
-
         Printer printer("/dev/ttyUSB0", 921600);
-
         PseudoTTY pty(200, 1, { "/bin/bash" });
         pty.openTTY();
         sleep(1); // give bash time to start up
 
+        // save last pressed key to prevent hold spamming
         KeymapEntry lastKey = { 0x00, 0x00 };
+
+        // app loop
         while (true) {
             try {
+                // print available pty content
                 while (pty.dataAvailable()) {
                     uint32_t codepoint = pty.readCodepointTTY();
                     if (codepoint != 0x00) printer.print(codepoint);
@@ -58,12 +62,10 @@ int main(int argc, char** argv) {
             }
 
             try {
+                // read keyboard key
                 KeymapEntry key = keyboard.readKey();
-
-                // not if same key
                 if (key == lastKey) continue;
-                lastKey = key;
-                // not if no key
+                lastKey = key; // assign key as last pressed
                 if (key == KeymapEntry{ 0x00, 0x00 }) continue;
 
                 pty.writeTTYCodepoint(key.codepoint);
