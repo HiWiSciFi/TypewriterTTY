@@ -14,43 +14,43 @@ uint8_t outPorts[8] = { 21, 20, 19, 18, 17, 16, 15, 14 };
 
 // TODO: consider using INPUT_PULLUP
 void setup() {
-  Serial.begin(921600);
-  while (!Serial);
+	Serial.begin(921600);
+	while (!Serial);
 
-  for (uint8_t i = 0; i < ASIZE(scanPorts); i++) pinMode(scanPorts[i], INPUT);
-  for (uint8_t i = 0; i < ASIZE(outPorts); i++) {
-    pinMode(outPorts[i], OUTPUT);
-    digitalWrite(outPorts[i], HIGH);
-  }
+	for (uint8_t i = 0; i < ASIZE(scanPorts); i++) pinMode(scanPorts[i], INPUT);
+	for (uint8_t i = 0; i < ASIZE(outPorts); i++) {
+		pinMode(outPorts[i], OUTPUT);
+		digitalWrite(outPorts[i], HIGH);
+	}
 }
 
 void loop() {
-  while (Serial.available() > 0) {
-    uint8_t c = (uint8_t)Serial.read();
-    Serial.print(ASCII_ACK);
-    writeKey(c);
-  }
+	while (Serial.available() > 0) {
+		uint8_t c = (uint8_t)Serial.read();
+		Serial.print(ASCII_ACK);
+		writeKey(c);
+	}
 
-  // writeKey(KEY_RETURN);
+	// writeKey(KEY_RETURN);
 
-  // writeKey('H');
-  // writeKey(KEY_MICRO);
-  // writeKey(KEY_BACKSPACE);
-  // writeKey('e');
-  // writeKey('l');
-  // writeKey('l');
-  // writeKey('o');
+	// writeKey('H');
+	// writeKey(KEY_MICRO);
+	// writeKey(KEY_BACKSPACE);
+	// writeKey('e');
+	// writeKey('l');
+	// writeKey('l');
+	// writeKey('o');
 
-  // writeKey(' ');
+	// writeKey(' ');
 
-  // writeKey('W');
-  // writeKey('o');
-  // writeKey('r');
-  // writeKey('l');
-  // writeKey('d');
-  // writeKey('!');
+	// writeKey('W');
+	// writeKey('o');
+	// writeKey('r');
+	// writeKey('l');
+	// writeKey('d');
+	// writeKey('!');
 
-  // writeKey(KEY_RETURN); // CR LF
+	// writeKey(KEY_RETURN); // CR LF
 
-  // delay(2000);
+	// delay(2000);
 }
