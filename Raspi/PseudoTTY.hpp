@@ -29,6 +29,9 @@ public:
     // throws: std::runtime_error
     void writeTTY(char c);
 
+    //throws: std::runtime_error
+    void writeTTYCodepoint(uint32_t codepoint);
+
     // throws: std::runtime_error
     std::string readTTY();
 

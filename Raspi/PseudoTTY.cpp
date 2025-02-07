@@ -87,6 +87,38 @@ void PseudoTTY::writeTTY(char c) {
         this->throwErrno();
 }
 
+void PseudoTTY::writeTTYCodepoint(uint32_t codepoint) {
+    char u8chars[4];
+    uint8_t size = 0;
+    if (codepoint >= 0x0000'0000 && codepoint <= 0x0000'007F) {
+        u8chars[0] = codepoint;
+        size = 1;
+    }
+    else if (codepoint >= 0x0000'0080 && codepoint <= 0x0000'07FF) {
+        u8chars[0] = (codepoint >> 8) & 0x1F;
+        u8chars[1] = codepoint & 0x3F;
+        size = 2;
+    }
+    else if (codepoint >= 0x0000'0800 && codepoint <= 0x0000'7FFF) {
+        u8chars[0] = (codepoint >> 16) & 0x0F;
+        u8chars[1] = (codepoint >> 8) & 0x3F;
+        u8chars[2] = codepoint & 0x3F;
+        size = 3;
+    }
+    else if (codepoint >= 0x0001'0000 && codepoint <= 0x0010'FFFF) {
+        u8chars[0] = (codepoint >> 24) & 0x07;
+        u8chars[1] = (codepoint >> 16) & 0x3F;
+        u8chars[2] = (codepoint >> 8) & 0x3F;
+        u8chars[3] = codepoint & 0x3F;
+        size = 4;
+    }
+    else
+        throw std::runtime_error("invalid unicode codepoint");
+
+    if (write(this->master, u8chars, size) == -1)
+        this->throwErrno();
+}
+
 std::string PseudoTTY::readTTY() {
     int bcount = -1;
     char buf[128];

@@ -66,8 +66,7 @@ int main(int argc, char** argv) {
                 // not if no key
                 if (key == KeymapEntry{ 0x00, 0x00 }) continue;
 
-                // std::cout << static_cast<char>(key.codepoint) << std::flush;
-                pty.writeTTY(static_cast<char>(key.codepoint));
+                pty.writeTTYCodepoint(key.codepoint);
             }
             catch (std::runtime_error e) {
                 std::cerr << "ERROR: " << e.what() << std::endl;
