@@ -29,6 +29,7 @@ Keyboard::Keyboard(const std::vector<int>& pinsScan, const std::vector<int>& pin
     this->setupPins();
 }
 
+#include <iostream>
 KeymapEntry Keyboard::readKey() {
     for (int iscan = 0; iscan < this->pinsScan.size(); iscan++) {
         digitalWrite(this->pinsScan[iscan], LOW);
@@ -43,14 +44,15 @@ KeymapEntry Keyboard::readKey() {
                 // check mod keys
                 digitalWrite(this->pinsScan[iscan], HIGH);
 
-                for (const auto& kv : modkeymap) {
-                    if (kv.second == MOD_NONE) continue;
-                    digitalWrite(this->pinsScan[iscan], LOW);
-                    delay(1);
-                    if (digitalRead(this->pinsOut[kv.first.scan]) == LOW) mapKey.mod |= kv.second;
-                    digitalWrite(this->pinsScan[kv.first.scan], HIGH);
-                }
+                // for (const auto& kv : modkeymap) {
+                //     if (kv.second == MOD_NONE) continue;
+                //     digitalWrite(this->pinsScan[iscan], LOW);
+                //     delay(1);
+                //     if (digitalRead(this->pinsOut[kv.first.scan]) == LOW) mapKey.mod |= kv.second;
+                //     digitalWrite(this->pinsScan[kv.first.scan], HIGH);
+                // }
 
+                // std::cout << "READ: KEY " << mapKey.scan << " " << mapKey.out << " " << static_cast<int>(mapKey.mod) << std::endl;
                 if (keymap.contains(mapKey))
                     return keymap.at(mapKey);
             }

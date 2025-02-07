@@ -22,6 +22,8 @@ void setup() {
 		pinMode(outPorts[i], OUTPUT);
 		digitalWrite(outPorts[i], HIGH);
 	}
+
+	writeKey(KEY_AUTORET_ON);
 }
 
 void loop() {

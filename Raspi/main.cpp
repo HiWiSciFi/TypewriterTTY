@@ -33,9 +33,10 @@
 // +-----+-----+---------+------+---+Pi Zero 2W+---+------+---------+-----+-----+
 
 #include <cstring>
+#include <bit>
 int main(int argc, char** argv) {
     // I/O pins for keyboard scanning
-    static const std::vector<int> pinsScan = { 10, 9, 11, 0, 5, 6, 13, 19, 26 };
+    static const std::vector<int> pinsScan = { 22, 10, 9, 11, 5, 6, 13, 19, 26 };
     static const std::vector<int> pinsOut = { 25, 8, 7, 1, 12, 16, 20, 21 };
 
     // set environment variables
@@ -54,7 +55,7 @@ int main(int argc, char** argv) {
         // initialize handlers
         Keyboard keyboard(pinsScan, pinsOut);
         Printer printer("/dev/ttyACM0", 921600);
-        PseudoTTY pty(200, 1, { "/bin/bash" }, myenv);
+        PseudoTTY pty(60, 1, { "/bin/bash" }, myenv);
         pty.openTTY();
         sleep(1); // give bash time to start up
 
@@ -67,6 +68,19 @@ int main(int argc, char** argv) {
                 // print available pty content
                 while (pty.dataAvailable()) {
                     uint32_t codepoint = pty.readCodepointTTY();
+                    
+                    // ignore copy/paste escape sequence TODO: DO PROPERLY YOU LAZY FUCK
+                    if (codepoint == 0x1b) {
+                        pty.readCodepointTTY();
+                        pty.readCodepointTTY();
+                        pty.readCodepointTTY();
+                        pty.readCodepointTTY();
+                        pty.readCodepointTTY();
+                        pty.readCodepointTTY();
+                        pty.readCodepointTTY();
+                        continue;
+                    }
+                    
                     if (codepoint != 0x00) printer.print(codepoint);
                 }
             }
@@ -80,6 +94,8 @@ int main(int argc, char** argv) {
                 if (key == lastKey) continue;
                 lastKey = key; // assign key as last pressed
                 if (key == KeymapEntry{ 0x00, 0x00 }) continue;
+
+                std::cout << "U+" << std::hex << key.codepoint << " 0x" << std::hex << static_cast<int>(key.key) << " c:" << static_cast<char>(key.codepoint) << std::endl;
 
                 pty.writeTTYCodepoint(key.codepoint);
             }

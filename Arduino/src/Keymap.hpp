@@ -17,6 +17,7 @@ struct KeymapEntry {
 #define KEY_RETURN    0x80 // CRLF
 #define KEY_DEL_WORD  0x81 // WORD OUT
 #define KEY_MICRO     0x9B // µ
+#define KEY_AUTORET_ON 0xA6
 
 // TODO: include commented non-ascii keys
 static KeymapEntry keymap[] = {
@@ -190,6 +191,8 @@ static KeymapEntry keymap[] = {
 	{ 6, 2, MOD_NONE,  true  }, // 0xA3 ü
 	{ 6, 2, MOD_SHIFT, true  }, // 0xA4 Ü
 	{ 6, 6, MOD_NONE,  true  }, // 0xA5 ß
+
+	{ 5, 0, MOD_CODE,  true  }, // 0xA6 AUTORETURN ON
 };
 
 #endif // __KEYMAP_HPP

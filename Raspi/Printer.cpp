@@ -20,17 +20,24 @@ Printer::~Printer() {
 
 #include <iostream>
 #include <bit>
+#include <unistd.h>
 void Printer::print(uint32_t codepoint) {
     // if (!unicodeMap.contains(codepoint)) return; // TODO: indicate error
-    if (!unicodeMap.contains(codepoint)) codepoint = 0x3F; // '?'
+    if (codepoint == 0x0d) return;
+    if (!unicodeMap.contains(codepoint)) {
+        std::cout << "Unknown codepoint U+" << std::hex << codepoint << std::endl;
+        codepoint = 0x3F; // '?'
+    }
 
     const char8_t* characters = unicodeMap.at(codepoint);
     for (int curr = 0; characters[curr] != u8'\0'; curr++) {
-        std::cout << std::bit_cast<char>(characters[curr]) << std::flush;
+        // std::cout << std::bit_cast<char>(characters[curr]) << std::flush;
         serialPutchar(this->fd, characters[curr]);
+        if (characters[curr] == '\n') usleep(10000 * 400);
     }
     // serialFlush(this->fd); // This crashes the PI (or at least its ethernet connection)
 
+    usleep(1000 * 180);
     while (!serialDataAvail(this->fd));
 
     int response = serialGetchar(this->fd);
