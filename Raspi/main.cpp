@@ -82,7 +82,8 @@ int main(int argc, char** argv) {
 				lastKey = key; // assign key as last pressed
 				if (key == KeymapEntry{ 0x00, 0x00 }) continue;
 
-				std::cout << "U+" << std::hex << key.codepoint << " 0x" << std::hex << static_cast<int>(key.key) << " c:" << static_cast<char>(key.codepoint) << std::endl;
+				std::cout << "U+" << std::hex << key.codepoint << " 0x" << std::hex << static_cast<int>(key.key)
+						  << " c:" << static_cast<char>(key.codepoint) << std::endl;
 
 				pty.writeTTYCodepoint(key.codepoint);
 			}
