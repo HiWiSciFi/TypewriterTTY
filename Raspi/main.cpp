@@ -35,77 +35,64 @@
 #include <cstring>
 #include <bit>
 int main(int argc, char** argv) {
-    // I/O pins for keyboard scanning
-    static const std::vector<int> pinsScan = { 22, 10, 9, 11, 5, 6, 13, 19, 26 };
-    static const std::vector<int> pinsOut = { 25, 8, 7, 1, 12, 16, 20, 21 };
+	// I/O pins for keyboard scanning
+	static const std::vector<int> pinsScan = { 22, 10, 9, 11, 5, 6, 13, 19, 26 };
+	static const std::vector<int> pinsOut = { 25, 8, 7, 1, 12, 16, 20, 21 };
 
-    // set environment variables
-    std::vector<char*> myenv;
-    int envCount = 0;
-    for (; environ[envCount] != nullptr; envCount++);
-    myenv.reserve(envCount + 2); // counted envs + potential TERM + nullptr (appended in PTY constructor)
-    for (int i = 0; environ[i] != nullptr; i++) {
-        if (strlen(environ[i]) >= 5 && strncmp(environ[i], "TERM=", 5) == 0)
-            continue;
-        myenv.push_back(environ[i]);
-    }
-    myenv.push_back(const_cast<char*>("TERM=vanilla"));
+	// set environment variables
+	std::vector<char*> myenv;
+	int envCount = 0;
+	for (; environ[envCount] != nullptr; envCount++);
+	myenv.reserve(envCount + 2); // counted envs + potential TERM + nullptr (appended in PTY constructor)
+	for (int i = 0; environ[i] != nullptr; i++) {
+		if (strlen(environ[i]) >= 5 && strncmp(environ[i], "TERM=", 5) == 0)
+			continue;
+		myenv.push_back(environ[i]);
+	}
+	myenv.push_back(const_cast<char*>("TERM=dumb"));
 
-    try {
-        // initialize handlers
-        Keyboard keyboard(pinsScan, pinsOut);
-        Printer printer("/dev/ttyACM0", 921600);
-        PseudoTTY pty(60, 1, { "/bin/bash" }, myenv);
-        pty.openTTY();
-        sleep(1); // give bash time to start up
+	try {
+		// initialize handlers
+		Keyboard keyboard(pinsScan, pinsOut);
+		Printer printer("/dev/ttyACM0", 921600);
+		PseudoTTY pty(60, 1, { "/bin/bash" }, myenv);
+		pty.openTTY();
+		sleep(1); // give bash time to start up
 
-        // save last pressed key to prevent hold spamming
-        KeymapEntry lastKey = { 0x00, 0x00 };
+		// save last pressed key to prevent hold spamming
+		KeymapEntry lastKey = { 0x00, 0x00 };
 
-        // app loop
-        while (true) {
-            try {
-                // print available pty content
-                while (pty.dataAvailable()) {
-                    uint32_t codepoint = pty.readCodepointTTY();
-                    
-                    // ignore copy/paste escape sequence TODO: DO PROPERLY YOU LAZY FUCK
-                    if (codepoint == 0x1b) {
-                        pty.readCodepointTTY();
-                        pty.readCodepointTTY();
-                        pty.readCodepointTTY();
-                        pty.readCodepointTTY();
-                        pty.readCodepointTTY();
-                        pty.readCodepointTTY();
-                        pty.readCodepointTTY();
-                        continue;
-                    }
-                    
-                    if (codepoint != 0x00) printer.print(codepoint);
-                }
-            }
-            catch (std::runtime_error e) {
-                std::cerr << "ERROR: " << e.what() << std::endl;
-            }
+		// app loop
+		while (true) {
+			try {
+				// print available pty content
+				while (pty.dataAvailable()) {
+					uint32_t codepoint = pty.readCodepointTTY();
+					if (codepoint != 0x00) printer.print(codepoint);
+				}
+			}
+			catch (std::runtime_error e) {
+				std::cerr << "ERROR: " << e.what() << std::endl;
+			}
 
-            try {
-                // read keyboard key
-                KeymapEntry key = keyboard.readKey();
-                if (key == lastKey) continue;
-                lastKey = key; // assign key as last pressed
-                if (key == KeymapEntry{ 0x00, 0x00 }) continue;
+			try {
+				// read keyboard key
+				KeymapEntry key = keyboard.readKey();
+				if (key == lastKey) continue;
+				lastKey = key; // assign key as last pressed
+				if (key == KeymapEntry{ 0x00, 0x00 }) continue;
 
-                std::cout << "U+" << std::hex << key.codepoint << " 0x" << std::hex << static_cast<int>(key.key) << " c:" << static_cast<char>(key.codepoint) << std::endl;
+				std::cout << "U+" << std::hex << key.codepoint << " 0x" << std::hex << static_cast<int>(key.key) << " c:" << static_cast<char>(key.codepoint) << std::endl;
 
-                pty.writeTTYCodepoint(key.codepoint);
-            }
-            catch (std::runtime_error e) {
-                std::cerr << "ERROR: " << e.what() << std::endl;
-            }
-        }
-    }
-    catch (std::runtime_error e) {
-        std::cerr << "ERROR: " << e.what() << std::endl;
-        exit(1);
-    }
+				pty.writeTTYCodepoint(key.codepoint);
+			}
+			catch (std::runtime_error e) {
+				std::cerr << "ERROR: " << e.what() << std::endl;
+			}
+		}
+	}
+	catch (std::runtime_error e) {
+		std::cerr << "ERROR: " << e.what() << std::endl;
+		exit(1);
+	}
 }
