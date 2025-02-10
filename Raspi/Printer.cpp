@@ -22,10 +22,9 @@ Printer::~Printer() {
 }
 
 void Printer::print(uint32_t codepoint) {
-	// if (!unicodeMap.contains(codepoint)) return; // TODO: indicate error
 	if (codepoint == 0x0d) return;
 	if (!unicodeMap.contains(codepoint)) {
-		std::cout << "Unknown codepoint U+" << std::hex << codepoint << std::endl;
+		std::cerr << "Unknown codepoint U+" << std::hex << codepoint << std::endl;
 		codepoint = 0x3F; // '?'
 	}
 
@@ -33,12 +32,14 @@ void Printer::print(uint32_t codepoint) {
 	for (int curr = 0; characters[curr] != u8'\0'; curr++) {
 		// std::cout << std::bit_cast<char>(characters[curr]) << std::flush;
 		serialPutchar(this->fd, characters[curr]);
-		timespec ts = { .tv_sec = 5, .tv_nsec = 0 };
-		if (characters[curr] == '\n') nanosleep(&ts, &ts); // wait for carriage return
+		if (characters[curr] == 0x80) {
+			timespec ts = { .tv_sec = 2, .tv_nsec = 0 }; // 10s
+			while (nanosleep(&ts, &ts) == -1 && errno == EINTR); // wait for carriage return
+		}
 	}
 	// serialFlush(this->fd); // This crashes the PI (or at least its ethernet connection)
 
-	timespec ts = { .tv_sec = 0, .tv_nsec = 1'000'000 * 250 };
+	timespec ts = { .tv_sec = 0, .tv_nsec = 1'000'000 * 200 }; // 200ms
 	nanosleep(&ts, &ts); // wait for buffer to catch up
 	while (!serialDataAvail(this->fd));
 

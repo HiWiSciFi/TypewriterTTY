@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 		// initialize handlers
 		Keyboard keyboard(pinsScan, pinsOut);
 		Printer printer("/dev/ttyACM0", 921600);
-		PseudoTTY pty(60, 1, { "/bin/bash" }, myenv);
+		PseudoTTY pty(75, 1, { "/bin/bash" }, myenv);
 		pty.openTTY();
 		sleep(1); // give bash time to start up
 

@@ -23,7 +23,7 @@ void setup() {
 		digitalWrite(outPorts[i], HIGH);
 	}
 
-	writeKey(KEY_AUTORET_ON);
+	// writeKey(KEY_AUTORET_ON);
 }
 
 void loop() {
