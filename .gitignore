@@ -1,4 +1,5 @@
 .vscode/
-*.o
+obj/
+
 typewriter
 nohup.out
