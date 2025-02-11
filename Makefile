@@ -1,7 +1,7 @@
 arduino_env := nanoevery
 
 CXX = g++
-CXXFLAGS = -Wall -Werror
+CXX_FLAGS = -Wall -I./Raspi/dependencies/toml11/single_include
 CXX_STD = c++20
 BIN = typewriter
 OBJ_DIR = ./obj

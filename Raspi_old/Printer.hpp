@@ -54,7 +54,6 @@ static const std::map<uint32_t, const char8_t*> unicodeMap = {
 	{ 0x0000'003B, u8";" },
 
 	{ 0x0000'003D, u8"=" },
-	{ 0x0000'003E, u8">" },
 	{ 0x0000'003F, u8"?" },
 	
 	{ 0x0000'0041, u8"A" },
