@@ -6,18 +6,6 @@
 
 #include <iostream>
 
-Config::Config(const std::string& path) {
-	toml::value data = toml::parse(path, toml::spec::v(1, 1, 0));
-
-	// auto val = toml::find<std::map<std::string, std::string>>(data, "mod");
-	// std::cout << data.at("mod").at("9").at("7").as_string() << std::endl;
-	auto table = data.as_table();
-
-	for (const auto& kv : table) {
-		std::cout << kv.first << std::endl;
-	}
-}
-
 static const constexpr uint8_t MOD_NONE = 0x00;
 static const constexpr uint8_t MOD_SHFT = 0x01;
 static const constexpr uint8_t MOD_CODE = 0x02;
@@ -32,6 +20,11 @@ KeyboardConfig::KeyboardConfig(const std::string& path) {
 				uint8_t scan = std::stoi(scanSec.first);
 				for (const auto& outSec : scanSec.second.as_table()) {
 					uint8_t out = std::stoi(outSec.first);
+					uint8_t mod = MOD_NONE;
+					if (outSec.first == "NONE") mod = MOD_NONE;
+					else if (outSec.first == "SHFT") mod = MOD_SHFT;
+					else if (outSec.first == "CODE") mod = MOD_CODE;
+					this->modMap.insert({ { scan, out }, mod });
 				}
 			}
 		}

@@ -5,13 +5,6 @@
 #include <map>
 #include <cstdint>
 
-class Config {
-public:
-
-
-	Config(const std::string& path);
-};
-
 class KeyboardConfig {
 private:
 	struct MatrixPos {
@@ -36,12 +29,12 @@ private:
 				|| (pos.scan == rhs.pos.scan && pos.out == rhs.pos.out && mod < rhs.mod);
 		}
 	};
-
+	
+public:
 	std::map<MatrixPos, uint8_t> modMap;
 	std::map<KeyboardKey, char32_t> codepointMap;
 	std::map<KeyboardKey, char8_t> keyMap;
 
-public:
 	KeyboardConfig(const std::string& path);
 };
 

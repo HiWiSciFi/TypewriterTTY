@@ -1,5 +1,5 @@
 [mod]
-9.7 = "SHIFT"
+9.7 = "SHFT"
 1.4 = "CODE"
 
 [codepoint]
@@ -125,3 +125,11 @@
 8.6.NONE = 0x94 # |<-|
 8.7.CODE = 0x97 # REV
 8.7.NONE = 0x96 # INDEX
+6.1.CODE = 0xA6 # AUTORETURN ON
+6.2.CODE = 0xA7 # AUTORETURN OFF
+7.1.CODE = 0xA8 # DOWN
+7.2.CODE = 0xA9 # UP
+4.2.CODE = 0xAA # UNDERLINE ON
+5.1.CODE = 0xAB # UNDERLINE OFF
+3.2.CODE = 0xAC # CTR
+4.1.CODE = 0xAD # RMF

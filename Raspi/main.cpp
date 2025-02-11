@@ -13,5 +13,5 @@ int main(int argc, char** argv) {
 	// PseudoTTY pty(75, 1, { "/bin/bash" }, { });
 	// pty.open();
 
-	KeyboardConfig cfg("Raspi/keymap.toml");
+	KeyboardConfig keyboardCfg("Raspi/keyboard.toml");
 }
