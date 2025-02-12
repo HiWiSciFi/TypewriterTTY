@@ -5,9 +5,9 @@
 #include "Config.hpp"
 #include "Printer.hpp"
 
-static constexpr const char* KEYBOARD_CONFIG_PATH = "Raspi/keyboard.toml";
-static constexpr const char* PRINTER_CONFIG_PATH  = "Raspi/printer.toml";
-static constexpr const char* TERMINAL_CONFIG_PATH = "Raspi/terminal.toml";
+static constexpr const char* KEYBOARD_CONFIG_PATH = "config/keyboard.toml";
+static constexpr const char* PRINTER_CONFIG_PATH  = "config/printer.toml";
+static constexpr const char* TERMINAL_CONFIG_PATH = "config/terminal.toml";
 
 int main(int argc, char** argv) {
 	std::cout << "Loading config files..." << std::endl;
