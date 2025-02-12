@@ -1,0 +1,11 @@
+[environment]
+env_inherit = true
+TERM = "dumb"
+
+[window]
+columns = 75
+rows = 1
+
+[shell]
+binary = "/bin/bash"
+arguments = [ ]

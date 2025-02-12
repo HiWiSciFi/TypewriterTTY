@@ -1,12 +1,13 @@
 #ifndef __CONFIG_HPP
 #define __CONFIG_HPP
 
-#include <string>
-#include <map>
 #include <cstdint>
+#include <map>
+#include <string>
+#include <vector>
 
 class KeyboardConfig {
-private:
+public:
 	struct MatrixPos {
 		uint8_t scan;
 		uint8_t out;
@@ -29,13 +30,45 @@ private:
 				|| (pos.scan == rhs.pos.scan && pos.out == rhs.pos.out && mod < rhs.mod);
 		}
 	};
-	
-public:
+
+	std::vector<int> pinsScan;
+	std::vector<int> pinsOut;
 	std::map<MatrixPos, uint8_t> modMap;
 	std::map<KeyboardKey, char32_t> codepointMap;
 	std::map<KeyboardKey, char8_t> keyMap;
 
 	KeyboardConfig(const std::string& path);
+};
+
+class PrinterConfig {
+public:
+	struct SerialSettings {
+		std::string port;
+		int baud;
+	};
+
+	SerialSettings serial;
+
+	PrinterConfig(const std::string& path);
+};
+
+class TerminalConfig {
+public:
+	struct WindowSettings {
+		unsigned short columns;
+		unsigned short rows;
+	};
+	
+	struct ShellSettings {
+		std::string binary;
+		std::vector<std::string> arguments;
+	};
+
+	std::vector<std::string> environment;
+	WindowSettings window;
+	ShellSettings shell;
+
+	TerminalConfig(const std::string& path);
 };
 
 #endif // __CONFIG_HPP

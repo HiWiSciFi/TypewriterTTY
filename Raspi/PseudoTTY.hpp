@@ -5,31 +5,32 @@
 #include <string>
 #include <sys/ioctl.h>
 #include <cstdint>
+#include <memory>
+
+#include "Config.hpp"
 
 class PseudoTTY {
 private:
+	std::shared_ptr<TerminalConfig> config;
 	int master = -1;
 	pid_t childPid = -1;
-	winsize winp;
-	std::vector<std::string> args;
-	std::vector<char*> env;
 
 public:
 	// throws
-	PseudoTTY(unsigned short columns, unsigned short rows, const std::vector<std::string>& args, const std::vector<char*>& env);
+	PseudoTTY(const std::shared_ptr<TerminalConfig>& config);
 
 	~PseudoTTY();
 
-	bool dataAvailable();
+	bool DataAvailable();
 
 	// throws
-	void writeCodepoint(char32_t codepoint);
+	void WriteCodepoint(char32_t codepoint);
 
 	// throws
-	char32_t readCodepoint();
+	char32_t ReadCodepoint();
 
 	//throws
-	void open();
+	void Open();
 };
 
 #endif // __PSEUDOTTY_HPP

@@ -1,17 +1,40 @@
 #include <iostream>
+#include <memory>
 
 #include "PseudoTTY.hpp"
 #include "Config.hpp"
+#include "Printer.hpp"
+
+static constexpr const char* KEYBOARD_CONFIG_PATH = "Raspi/keyboard.toml";
+static constexpr const char* PRINTER_CONFIG_PATH  = "Raspi/printer.toml";
+static constexpr const char* TERMINAL_CONFIG_PATH = "Raspi/terminal.toml";
 
 int main(int argc, char** argv) {
-	// I/O pins for keyboard scanning
-	static const std::vector<int> pinsScan = { 22, 10, 9, 11, 5, 6, 13, 19, 26 };
-	static const std::vector<int> pinsOut = { 25, 8, 7, 1, 12, 16, 20, 21 };
+	std::cout << "Loading config files..." << std::endl;
+	std::cout << "Keyboard..." << std::endl;
+	auto keyboardCfg = std::make_shared<KeyboardConfig>(KEYBOARD_CONFIG_PATH);
+	std::cout << "Printer..." << std::endl;
+	auto printerCfg = std::make_shared<PrinterConfig>(PRINTER_CONFIG_PATH);
+	std::cout << "Terminal..." << std::endl;
+	auto terminalCfg = std::make_shared<TerminalConfig>(TERMINAL_CONFIG_PATH);
+	std::cout << "Config files loaded." << std::endl;
 
-	// read config
+	std::cout << "Connecting to Arduino..." << std::endl;
+	Printer printer(printerCfg);
+	std::cout << "Waiting for Typewriter to become active..." << std::endl;
+	printer.WaitForAvailable();
+	std::cout << "Typewriter available." << std::endl;
 
-	// PseudoTTY pty(75, 1, { "/bin/bash" }, { });
-	// pty.open();
+	std::cout << "Prepare shell environment..." << std::endl;
+	PseudoTTY pty(terminalCfg);
+	std::cout << "Start shell..." << std::endl;
+	pty.Open();
 
-	KeyboardConfig keyboardCfg("Raspi/keyboard.toml");
+	pid_t pid = fork();
+
+	switch (pid) {
+		case -1: break; // error
+		case 0:  break; // child
+		default: break; // parent
+	}
 }
