@@ -4,6 +4,8 @@
 #include <pty.h>
 #include <fcntl.h>
 #include <sstream>
+#include <signal.h>
+#include <sys/wait.h>
 
 #include "Util.hpp"
 
@@ -12,7 +14,12 @@ PseudoTTY::PseudoTTY(const std::shared_ptr<TerminalConfig>& config) {
 }
 
 PseudoTTY::~PseudoTTY() {
-
+	if (this->childPid > 0) {
+		if (this->master != -1)
+			if (close(this->master) == -1) Util::ThrowErrno();
+		if (kill(this->childPid, SIGKILL) == -1) Util::ThrowErrno();
+		waitpid(this->childPid, NULL, 0);
+	}
 }
 
 bool PseudoTTY::DataAvailable() {
@@ -26,7 +33,38 @@ bool PseudoTTY::DataAvailable() {
 }
 
 void PseudoTTY::WriteCodepoint(char32_t codepoint) {
-	
+	char8_t u8chars[4];
+	uint8_t size = 0;
+	if (codepoint >= 0x0000'0000 && codepoint <= 0x0000'007F) {
+		u8chars[0] = codepoint;
+		size = 1;
+	}
+	else if (codepoint >= 0x0000'0080 && codepoint <= 0x0000'07FF) {
+		u8chars[0] = (codepoint >> 8) & 0x1F;
+		u8chars[1] = codepoint & 0x3F;
+		size = 2;
+	}
+	else if (codepoint >= 0x0000'0800 && codepoint <= 0x0000'7FFF) {
+		u8chars[0] = (codepoint >> 16) & 0x0F;
+		u8chars[1] = (codepoint >> 8) & 0x3F;
+		u8chars[2] = codepoint & 0x3F;
+		size = 3;
+	}
+	else if (codepoint >= 0x0001'0000 && codepoint <= 0x0010'FFFF) {
+		u8chars[0] = (codepoint >> 24) & 0x07;
+		u8chars[1] = (codepoint >> 16) & 0x3F;
+		u8chars[2] = (codepoint >> 8) & 0x3F;
+		u8chars[3] = codepoint & 0x3F;
+		size = 4;
+	}
+	else {
+		std::stringstream ss;
+		ss << "invalid unicode codepoint U+" << std::hex << static_cast<uint32_t>(codepoint);
+		throw std::runtime_error(ss.str());
+	}
+
+	if (write(this->master, u8chars, size) == -1)
+		Util::ThrowErrno();
 }
 
 // TODO: maybe rework if fcntl gets removed
@@ -60,7 +98,8 @@ char32_t PseudoTTY::ReadCodepoint() {
 	codepoint = buf[0] & fbMask;
 
 	if (read(this->master, &buf[1], size) == -1) {
-		if (errno == EWOULDBLOCK) throw std::runtime_error("unexpected end of UTF-8 stream");
+		if (errno == EWOULDBLOCK)
+			throw std::runtime_error("unexpected end of UTF-8 stream");
 		Util::ThrowErrno();
 	}
 
@@ -88,37 +127,37 @@ void PseudoTTY::Open() {
 	this->childPid = forkpty(&this->master, NULL, NULL, &winp);
 
 	switch (this->childPid) {
-		case -1:
-			Util::ThrowErrno();
-			break;
-		case 0:
-			{
-				// child process
-				
-				// arrange env vars
-				std::vector<char*> envp;
-				envp.reserve(this->config->environment.size() + 1);
-				for (size_t i = 0; i < this->config->environment.size(); i++)
-					envp.push_back(this->config->environment[i].data());
-				envp.push_back(nullptr);
-	
-				// arrange args
-				std::vector<char*> argv;
-				argv.reserve(this->config->shell.arguments.size() + 1);
-				for (size_t i = 0; i < this->config->shell.arguments.size(); i++)
-					argv.push_back(this->config->shell.arguments[i].data());
-				argv.push_back(nullptr);
-	
-				// TODO: handle termination
-				execvpe(this->config->shell.binary.c_str(), argv.data(), envp.data());
-	
-				break;
-			}
-		default:
-			// parent process
-			// TODO check following lines for necessity
-			// if (fcntl(this->master, F_SETFL, O_NONBLOCK) == -1)
-			// 	Util::ThrowErrno();
-			break;
+	case -1:
+		Util::ThrowErrno();
+		break;
+	case 0:
+	{
+		// child process
+
+		// arrange env vars
+		std::vector<char*> envp;
+		envp.reserve(this->config->environment.size() + 1);
+		for (size_t i = 0; i < this->config->environment.size(); i++)
+			envp.push_back(this->config->environment[i].data());
+		envp.push_back(nullptr);
+
+		// arrange args
+		std::vector<char*> argv;
+		argv.reserve(this->config->shell.arguments.size() + 1);
+		for (size_t i = 0; i < this->config->shell.arguments.size(); i++)
+			argv.push_back(this->config->shell.arguments[i].data());
+		argv.push_back(nullptr);
+
+		// TODO: handle termination
+		execvpe(this->config->shell.binary.c_str(), argv.data(), envp.data());
+
+		break;
+	}
+	default:
+		// parent process
+		// TODO check following lines for necessity
+		// if (fcntl(this->master, F_SETFL, O_NONBLOCK) == -1)
+		// 	Util::ThrowErrno();
+		break;
 	}
 }

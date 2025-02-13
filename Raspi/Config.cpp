@@ -14,10 +14,6 @@ PrinterConfig::PrinterConfig(const std::string& path) {
 	this->serial.baud = serialSection.at("baud").as_integer();
 }
 
-static const constexpr uint8_t MOD_NONE = 0x00;
-static const constexpr uint8_t MOD_SHFT = 0x01;
-static const constexpr uint8_t MOD_CODE = 0x02;
-
 KeyboardConfig::KeyboardConfig(const std::string& path) {
 	auto fileMap = toml::parse(path, toml::spec::v(1, 1, 0)).as_table();
 

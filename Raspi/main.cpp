@@ -4,10 +4,14 @@
 #include "PseudoTTY.hpp"
 #include "Config.hpp"
 #include "Printer.hpp"
+#include "Keyboard.hpp"
 
 static constexpr const char* KEYBOARD_CONFIG_PATH = "config/keyboard.toml";
-static constexpr const char* PRINTER_CONFIG_PATH  = "config/printer.toml";
+static constexpr const char* PRINTER_CONFIG_PATH = "config/printer.toml";
 static constexpr const char* TERMINAL_CONFIG_PATH = "config/terminal.toml";
+
+void RunPrinter(Printer& printer);
+void RunKeyboard(Keyboard& keyboard);
 
 int main(int argc, char** argv) {
 	std::cout << "Loading config files..." << std::endl;
@@ -33,8 +37,36 @@ int main(int argc, char** argv) {
 	pid_t pid = fork();
 
 	switch (pid) {
-		case -1: break; // error
-		case 0:  break; // child
-		default: break; // parent
+	case -1: throw std::runtime_error("failed to fork"); break; // error
+	case 0: RunPrinter(printer); break; // child
+	default: // parent
+	{
+		Keyboard keyboard(keyboardCfg);
+		RunKeyboard(keyboard);
+		break;
+	}
+	}
+}
+
+void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty) {
+	keyboard.Setup();
+
+	while (true) {
+		auto key = keyboard.GetKey();
+		switch (key.type) {
+		case Keyboard::KeyType::UNICODE:
+			pty.WriteCodepoint(key.codepoint);
+			break;
+		case Keyboard::KeyType::KEYCODE:
+			// TODO
+			break;
+		default: break;
+		}
+	}
+}
+
+void RunPrinter(Printer& printer) {
+	while (true) {
+
 	}
 }

@@ -6,6 +6,10 @@
 #include <string>
 #include <vector>
 
+static constexpr const uint8_t MOD_NONE = 0x00;
+static constexpr const uint8_t MOD_SHFT = 0x01;
+static constexpr const uint8_t MOD_CODE = 0x02;
+
 class KeyboardConfig {
 public:
 	struct MatrixPos {
@@ -58,7 +62,7 @@ public:
 		unsigned short columns;
 		unsigned short rows;
 	};
-	
+
 	struct ShellSettings {
 		std::string binary;
 		std::vector<std::string> arguments;
