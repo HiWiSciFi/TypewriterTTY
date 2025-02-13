@@ -43,5 +43,5 @@ int writeKey(uint8_t keycode) {
 }
 
 void waitForScan(uint8_t scan) {
-	waitForEdge(scan, FALLING);
+	waitForEdge(scan, RISING);
 }
