@@ -24,7 +24,7 @@ void setup() {
 	Serial.begin(921600);
 	while (!Serial);
 
-	while (Serial.available() <= 0);
+	// while (Serial.available() <= 0);
 	int request = Serial.read();
 	// if (request != ASCII_ENQ) // TODO
 
@@ -32,12 +32,14 @@ void setup() {
 	delay(8000); // min 6s
 
 	Serial.print(ASCII_ACK);
+	Serial.flush();
 }
 
 void loop() {
 	while (Serial.available() > 0) {
 		uint8_t c = (uint8_t)Serial.read();
 		Serial.print(writeKey(c) == 0 ? ASCII_ACK : ASCII_NAK);
+		Serial.flush();
 	}
 
 	// writeKey(KEY_RETURN);
