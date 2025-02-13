@@ -1,8 +1,8 @@
 #include "Printer.hpp"
 
-#include <wiringSerial.h>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
+#include <wiringSerial.h>
 
 static const constexpr char8_t ASCII_ENQ = 0x05;
 static const constexpr char8_t ASCII_ACK = 0x06;

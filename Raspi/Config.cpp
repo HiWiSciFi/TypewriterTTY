@@ -5,13 +5,13 @@
 
 // TODO: rewrite keyboard config loading
 
-#include "Util.hpp"
-
 #include <cstring>
 #include <map>
 #include <sstream>
 #include <string>
 #include <toml.hpp>
+
+#include "Util.hpp"
 
 PrinterConfig::PrinterConfig(const std::string& path) {
 	auto fileMap = toml::parse(path, toml::spec::v(1, 1, 0)).as_table();

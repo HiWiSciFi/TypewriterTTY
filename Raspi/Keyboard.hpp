@@ -1,9 +1,10 @@
 #ifndef __KEYBOARD_HPP
 #define __KEYBOARD_HPP
 
-#include "Config.hpp"
-#include <memory>
 #include <cstdint>
+#include <memory>
+
+#include "Config.hpp"
 
 class Keyboard {
 private:
