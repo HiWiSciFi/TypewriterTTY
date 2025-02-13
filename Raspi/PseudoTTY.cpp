@@ -1,10 +1,10 @@
 #include "PseudoTTY.hpp"
 
+#include <fcntl.h>
 #include <poll.h>
 #include <pty.h>
-#include <fcntl.h>
-#include <sstream>
 #include <signal.h>
+#include <sstream>
 #include <sys/wait.h>
 
 #include "Util.hpp"
@@ -33,37 +33,10 @@ bool PseudoTTY::DataAvailable() {
 }
 
 void PseudoTTY::WriteCodepoint(char32_t codepoint) {
-	char8_t u8chars[4];
-	uint8_t size = 0;
-	if (codepoint >= 0x0000'0000 && codepoint <= 0x0000'007F) {
-		u8chars[0] = codepoint;
-		size = 1;
-	}
-	else if (codepoint >= 0x0000'0080 && codepoint <= 0x0000'07FF) {
-		u8chars[0] = (codepoint >> 8) & 0x1F;
-		u8chars[1] = codepoint & 0x3F;
-		size = 2;
-	}
-	else if (codepoint >= 0x0000'0800 && codepoint <= 0x0000'7FFF) {
-		u8chars[0] = (codepoint >> 16) & 0x0F;
-		u8chars[1] = (codepoint >> 8) & 0x3F;
-		u8chars[2] = codepoint & 0x3F;
-		size = 3;
-	}
-	else if (codepoint >= 0x0001'0000 && codepoint <= 0x0010'FFFF) {
-		u8chars[0] = (codepoint >> 24) & 0x07;
-		u8chars[1] = (codepoint >> 16) & 0x3F;
-		u8chars[2] = (codepoint >> 8) & 0x3F;
-		u8chars[3] = codepoint & 0x3F;
-		size = 4;
-	}
-	else {
-		std::stringstream ss;
-		ss << "invalid unicode codepoint U+" << std::hex << static_cast<uint32_t>(codepoint);
-		throw std::runtime_error(ss.str());
-	}
+	char8_t buf[4];
+	uint8_t length = Util::CodepointGetUTF8(codepoint, buf);
 
-	if (write(this->master, u8chars, size) == -1)
+	if (write(this->master, buf, length) == -1)
 		Util::ThrowErrno();
 }
 
@@ -77,41 +50,15 @@ char32_t PseudoTTY::ReadCodepoint() {
 		Util::ThrowErrno();
 	}
 
-	uint8_t size = 0;
-	if ((buf[0] & 0b1000'0000) == 0b0000'0000)
-		size = 0;
-	else if ((buf[0] & 0b1110'0000) == 0b1100'0000)
-		size = 1;
-	else if ((buf[0] & 0b1111'0000) == 0b1110'0000)
-		size = 2;
-	else if ((buf[0] & 0b1111'1000) == 0b1111'0000)
-		size = 3;
-	else {
-		std::stringstream ss;
-		ss << "invalid UTF-8 starting Byte 0x" << std::hex << static_cast<int>(buf[0]);
-		throw std::runtime_error(ss.str());
-	}
+	uint8_t length = Util::UTF8GetByteLength(buf[0]);
 
-	static char8_t fbMasks[] = { 0b0111'1111, 0b0001'1111, 0b0000'1111, 0b0000'0111 };
-	char8_t fbMask = fbMasks[size];
-
-	codepoint = buf[0] & fbMask;
-
-	if (read(this->master, &buf[1], size) == -1) {
+	if (read(this->master, &buf[1], length - 1) == -1) {
 		if (errno == EWOULDBLOCK)
-			throw std::runtime_error("unexpected end of UTF-8 stream");
+			throw std::runtime_error("unexpected end if UTF-8 stream");
 		Util::ThrowErrno();
 	}
 
-	for (int8_t i = 0; i < size; i++) {
-		if ((buf[i] & 0b1100'0000) != 0b1000'0000) {
-			std::stringstream ss;
-			ss << "invalid UTF-8 continuation Byte 0x" << std::hex << static_cast<int>(buf[i]);
-			throw std::runtime_error(ss.str());
-		}
-		codepoint <<= 6;
-		codepoint |= buf[i] & 0b0011'1111;
-	}
+	codepoint = Util::UTF8GetCodepoint(buf, length);
 
 	return codepoint;
 }
@@ -156,8 +103,8 @@ void PseudoTTY::Open() {
 	default:
 		// parent process
 		// TODO check following lines for necessity
-		// if (fcntl(this->master, F_SETFL, O_NONBLOCK) == -1)
-		// 	Util::ThrowErrno();
+		if (fcntl(this->master, F_SETFL, O_NONBLOCK) == -1)
+			Util::ThrowErrno();
 		break;
 	}
 }

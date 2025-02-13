@@ -1,11 +1,11 @@
 #ifndef __PSEUDOTTY_HPP
 #define __PSEUDOTTY_HPP
 
-#include <vector>
-#include <string>
-#include <sys/ioctl.h>
 #include <cstdint>
 #include <memory>
+#include <string>
+#include <sys/ioctl.h>
+#include <vector>
 
 #include "Config.hpp"
 

@@ -1,17 +1,18 @@
 #include <iostream>
 #include <memory>
 
-#include "PseudoTTY.hpp"
 #include "Config.hpp"
-#include "Printer.hpp"
 #include "Keyboard.hpp"
+#include "Printer.hpp"
+#include "PseudoTTY.hpp"
+#include "Util.hpp"
 
 static constexpr const char* KEYBOARD_CONFIG_PATH = "config/keyboard.toml";
 static constexpr const char* PRINTER_CONFIG_PATH = "config/printer.toml";
 static constexpr const char* TERMINAL_CONFIG_PATH = "config/terminal.toml";
 
-void RunPrinter(Printer& printer);
-void RunKeyboard(Keyboard& keyboard);
+void RunPrinter(Printer& printer, PseudoTTY& pty);
+void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty);
 
 int main(int argc, char** argv) {
 	std::cout << "Loading config files..." << std::endl;
@@ -38,11 +39,11 @@ int main(int argc, char** argv) {
 
 	switch (pid) {
 	case -1: throw std::runtime_error("failed to fork"); break; // error
-	case 0: RunPrinter(printer); break; // child
+	case 0: RunPrinter(printer, pty); break; // child
 	default: // parent
 	{
 		Keyboard keyboard(keyboardCfg);
-		RunKeyboard(keyboard);
+		RunKeyboard(keyboard, pty);
 		break;
 	}
 	}
@@ -65,8 +66,10 @@ void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty) {
 	}
 }
 
-void RunPrinter(Printer& printer) {
+void RunPrinter(Printer& printer, PseudoTTY& pty) {
 	while (true) {
-
+		while (!pty.DataAvailable()); // TODO: recheck if fcntl is removed
+		char32_t codepoint = pty.ReadCodepoint();
+		printer.PrintCodepoint(codepoint);
 	}
 }

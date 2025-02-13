@@ -1,10 +1,17 @@
 #include "Config.hpp"
 
+// File note: maybe generically generate the possible mod keys for the keyboard configuration from
+//            the entries in the mod section
+
+// TODO: rewrite keyboard config loading
+
+#include "Util.hpp"
+
+#include <cstring>
 #include <map>
+#include <sstream>
 #include <string>
 #include <toml.hpp>
-#include <sstream>
-#include <cstring>
 
 PrinterConfig::PrinterConfig(const std::string& path) {
 	auto fileMap = toml::parse(path, toml::spec::v(1, 1, 0)).as_table();
@@ -12,6 +19,28 @@ PrinterConfig::PrinterConfig(const std::string& path) {
 	auto serialSection = fileMap.at("serial");
 	this->serial.port = serialSection.at("port").as_string();
 	this->serial.baud = serialSection.at("baud").as_integer();
+
+	auto printerSection = fileMap.at("printer").as_table();
+	this->printer.translationFallback = printerSection.at("translation fallback").as_integer();
+
+	auto codepointSection = fileMap.at("translation").as_table();
+	for (const auto& te : codepointSection) {
+		if (te.first.length() < 1)
+			throw std::runtime_error("invalid toml key");
+		uint8_t length = Util::UTF8GetByteLength(te.first.at(0));
+		if (te.first.length() != length)
+			throw std::runtime_error("invalid translation map key");
+		char32_t codepoint = Util::UTF8GetCodepoint(reinterpret_cast<const char8_t*>(te.first.data()), length);
+		
+		auto charArray = te.second.as_array();
+		std::u8string str;
+		str.resize(charArray.size());
+		for (size_t i = 0; i < charArray.size(); i++) {
+			str.data()[i] = charArray.at(i).as_integer();
+		}
+
+		this->translationMap.insert({ codepoint, str });
+	}
 }
 
 KeyboardConfig::KeyboardConfig(const std::string& path) {

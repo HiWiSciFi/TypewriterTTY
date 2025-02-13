@@ -1,6 +1,7 @@
 #ifndef __PRINTER_HPP
 #define __PRINTER_HPP
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -8,6 +9,7 @@
 
 class Printer {
 private:
+	std::shared_ptr<PrinterConfig> config;
 	int serial;
 	bool connected = false;
 
@@ -16,6 +18,8 @@ public:
 	~Printer();
 
 	void WaitForAvailable();
+
+	void PrintCodepoint(char32_t codepoint);
 };
 
 #endif // __PRINTER_HPP

@@ -50,8 +50,13 @@ public:
 		std::string port;
 		int baud;
 	};
+	struct PrinterSettings{
+		char32_t translationFallback;
+	};
 
 	SerialSettings serial;
+	PrinterSettings printer;
+	std::map<char32_t, std::u8string> translationMap;
 
 	PrinterConfig(const std::string& path);
 };
