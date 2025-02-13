@@ -24,12 +24,12 @@ int writeKey(uint8_t keycode) {
 
 	// return 0; // TODO: remove
 
-	if (key.mod & MOD_SHFT) outputKey(8, 6);
+	if (key.mod & MOD_SHIFT) outputKey(8, 6);
 	if (key.mod & MOD_CODE) outputKey(0, 3);
 
 	for (int i = 0; i < 3; i++) {
 		outputKey(key.scan, key.out);
-		if (key.mod & MOD_SHFT) outputKey(8, 6);
+		if (key.mod & MOD_SHIFT) outputKey(8, 6);
 		if (key.mod & MOD_CODE) outputKey(0, 3);
 	}
 
@@ -40,8 +40,4 @@ int writeKey(uint8_t keycode) {
 	}
 
 	return 0;
-}
-
-void waitForScan(uint8_t scan) {
-	waitForEdge(scan, FALLING);
 }

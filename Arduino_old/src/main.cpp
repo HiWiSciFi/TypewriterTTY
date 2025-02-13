@@ -7,7 +7,6 @@ uint8_t outPorts[8] = { 21, 20, 19, 18, 17, 16, 15, 14 };
 // uint8_t scanPorts[9] = { 45, 46, 47, 48, 49, 50, 51, 52, 53 };
 // uint8_t outPorts[8] = { 34, 35, 36, 37, 38, 39, 40, 41 };
 
-static constexpr char ASCII_ENQ = 0x05;
 static constexpr char ASCII_ACK = 0x06;
 static constexpr char ASCII_NAK = 0x15;
 
@@ -15,23 +14,16 @@ static constexpr char ASCII_NAK = 0x15;
 
 // TODO: consider using INPUT_PULLUP
 void setup() {
+	Serial.begin(921600);
+	while (!Serial);
+
 	for (uint8_t i = 0; i < ASIZE(scanPorts); i++) pinMode(scanPorts[i], INPUT);
 	for (uint8_t i = 0; i < ASIZE(outPorts); i++) {
 		pinMode(outPorts[i], OUTPUT);
 		digitalWrite(outPorts[i], HIGH);
 	}
 
-	Serial.begin(921600);
-	while (!Serial);
-
-	while (Serial.available() <= 0);
-	int request = Serial.read();
-	// if (request != ASCII_ENQ) // TODO
-
-	waitForScan(0);
-	delay(8000); // min 6s
-
-	Serial.print(ASCII_ACK);
+	// writeKey(KEY_AUTORET_ON);
 }
 
 void loop() {

@@ -6,6 +6,4 @@
 // returns 0 on success, -1 on error
 int writeKey(uint8_t keycode);
 
-void waitForScan(uint8_t scan);
-
 #endif // __KEYBOARD_HPP
