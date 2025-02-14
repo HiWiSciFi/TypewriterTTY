@@ -52,8 +52,14 @@ int main(int argc, char** argv) {
 void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty) {
 	keyboard.Setup();
 
+	Keyboard::KeyResult lastKey = { Keyboard::KeyType::NONE, 0x00000000, 0x00 };
 	while (true) {
 		auto key = keyboard.GetKey();
+		if (key == lastKey) continue;
+		lastKey = key;
+
+		std::cout << "Pressed U+" << std::hex << static_cast<uint32_t>(key.codepoint) << std::endl;
+
 		switch (key.type) {
 		case Keyboard::KeyType::UNICODE:
 			pty.WriteCodepoint(key.codepoint);

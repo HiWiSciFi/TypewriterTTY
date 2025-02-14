@@ -92,3 +92,18 @@ uint8_t Util::CodepointGetUTF8(char32_t codepoint, char8_t* buffer) {
 
 	return length;
 }
+
+void Util::Sleep(time_t s, long ms, long ns) {
+	ms += ns / 1'000'000;
+	ns -= ns % 1'000'000;
+
+	s += ms / 1000;
+	ms -= ms % 1000;
+
+	timespec ts = { .tv_sec = s, .tv_nsec = (1'000'000 * ms) + ns };
+	int err = 0;
+	while ((err = nanosleep(&ts, &ts)) == -1 && errno == EINTR);
+	if (err != 0) {
+		ThrowErrno();
+	}
+}

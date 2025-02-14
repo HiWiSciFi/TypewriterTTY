@@ -2,6 +2,8 @@
 
 #include <wiringPi.h>
 
+#include "Util.hpp"
+
 Keyboard::Keyboard(const std::shared_ptr<KeyboardConfig>& config) {
 	this->config = config;
 }
@@ -25,7 +27,11 @@ Keyboard::KeyResult Keyboard::GetKey() {
 
 	for (int iscan = 0; iscan < this->config->pinsScan.size(); iscan++) {
 		digitalWrite(this->config->pinsScan[iscan], LOW);
-		// TODO sleep
+
+		// TODO: sleep
+		// TODO: check necessity
+		Util::Sleep(0, 1, 0);
+
 		for (int iout = 0; iout < this->config->pinsOut.size(); iout++) {
 			KeyboardConfig::KeyboardKey mapKey = { { iscan, iout }, MOD_NONE };
 
@@ -40,7 +46,11 @@ Keyboard::KeyResult Keyboard::GetKey() {
 					if (modkey.second == MOD_NONE) continue;
 
 					digitalWrite(this->config->pinsScan[modkey.first.scan], LOW);
-					// TODO sleep
+
+					// TODO: sleep
+					// TODO: check necessity
+					Util::Sleep(0, 1, 0);
+
 					if (digitalRead(this->config->pinsOut[modkey.first.out]) == LOW) {
 						mapKey.mod |= modkey.second;
 					}

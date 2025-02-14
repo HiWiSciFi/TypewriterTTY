@@ -24,6 +24,12 @@ public:
 		KeyType type;
 		char32_t codepoint;
 		char8_t keycode;
+
+		bool operator==(const KeyResult& other) {
+			return this->type == other.type
+				&& this->codepoint == other.codepoint
+				&& this->keycode == other.keycode;
+		}
 	};
 	KeyResult GetKey();
 };
