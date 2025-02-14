@@ -31,7 +31,7 @@ static KeymapEntry keymap[] = {
 	{ 9, 9, MOD_NONE, false }, // 0x07 Bell
 	{ 6, 7, MOD_NONE, true  }, // 0x08 Backspace
 	{ 9, 9, MOD_NONE, false }, // 0x09 Horizontal Tab
-	{ 9, 9, MOD_NONE, false }, // 0x0A LF
+	{ 7, 4, MOD_NONE, true  }, // 0x0A LF // !!!!!!!!!!TEMP!!!!!!!!!!!!! Original line: { 9, 9, MOD_NONE, false }, // 0x0A LF
 	{ 9, 9, MOD_NONE, false }, // 0x0B Vertical Tab
 	{ 9, 9, MOD_NONE, false }, // 0x0C NP Form feed / New page
 	{ 9, 9, MOD_NONE, false }, // 0x0D CR

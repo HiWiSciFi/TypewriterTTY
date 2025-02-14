@@ -53,22 +53,23 @@ KeyboardConfig::KeyboardConfig(const std::string& path) {
 		}
 		else if (section.first == "mod") {
 			for (const auto& scanSec : section.second.as_table()) {
-				uint8_t scan = std::stoi(scanSec.first);
+				uint8_t scan = std::stoi(scanSec.first) - 1;
 				for (const auto& outSec : scanSec.second.as_table()) {
-					uint8_t out = std::stoi(outSec.first);
+					uint8_t out = std::stoi(outSec.first) - 1;
 					uint8_t mod = MOD_NONE;
-					if (outSec.first == "NONE") mod = MOD_NONE;
-					else if (outSec.first == "SHFT") mod = MOD_SHFT;
-					else if (outSec.first == "CODE") mod = MOD_CODE;
+					auto modVal = outSec.second.as_string();
+					if (modVal == "NONE") mod = MOD_NONE;
+					else if (modVal == "SHFT") mod = MOD_SHFT;
+					else if (modVal == "CODE") mod = MOD_CODE;
 					this->modMap.insert({ { scan, out }, mod });
 				}
 			}
 		}
 		else if (section.first == "codepoint") {
 			for (const auto& scanSec : section.second.as_table()) {
-				uint8_t scan = std::stoi(scanSec.first);
+				uint8_t scan = std::stoi(scanSec.first) - 1;
 				for (const auto& outSec : scanSec.second.as_table()) {
-					uint8_t out = std::stoi(outSec.first);
+					uint8_t out = std::stoi(outSec.first) - 1;
 					for (const auto& modSec : outSec.second.as_table()) {
 						uint8_t mod = MOD_NONE;
 						if (modSec.first == "NONE") mod = MOD_NONE;
@@ -82,9 +83,9 @@ KeyboardConfig::KeyboardConfig(const std::string& path) {
 		}
 		else if (section.first == "key") {
 			for (const auto& scanSec : section.second.as_table()) {
-				uint8_t scan = std::stoi(scanSec.first);
+				uint8_t scan = std::stoi(scanSec.first) - 1;
 				for (const auto& outSec : scanSec.second.as_table()) {
-					uint8_t out = std::stoi(outSec.first);
+					uint8_t out = std::stoi(outSec.first) - 1;
 					for (const auto& modSec : outSec.second.as_table()) {
 						uint8_t mod = MOD_NONE;
 						if (modSec.first == "NONE") mod = MOD_NONE;

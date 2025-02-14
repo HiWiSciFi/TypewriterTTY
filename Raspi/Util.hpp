@@ -2,6 +2,7 @@
 #define __UTIL_HPP
 
 #include <cstdint>
+#include <time.h>
 
 class Util {
 public:

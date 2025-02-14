@@ -69,6 +69,7 @@ Keyboard::KeyResult Keyboard::GetKey() {
 				}
 			}
 		}
+		digitalWrite(this->config->pinsScan[iscan], HIGH);
 	}
 
 	return result;

@@ -29,7 +29,7 @@ void setup() {
 	// if (request != ASCII_ENQ) // TODO
 
 	waitForScan(0);
-	delay(8000); // min 6s
+	delay(6000); // min 6s
 
 	Serial.print(ASCII_ACK);
 	Serial.flush();

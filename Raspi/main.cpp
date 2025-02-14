@@ -35,6 +35,8 @@ int main(int argc, char** argv) {
 	std::cout << "Start shell..." << std::endl;
 	pty.Open();
 
+	std::cout << "Done." << std::endl;
+
 	pid_t pid = fork();
 
 	switch (pid) {
@@ -58,13 +60,13 @@ void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty) {
 		if (key == lastKey) continue;
 		lastKey = key;
 
-		std::cout << "Pressed U+" << std::hex << static_cast<uint32_t>(key.codepoint) << std::endl;
-
 		switch (key.type) {
 		case Keyboard::KeyType::UNICODE:
+			std::cout << "Pressed U+" << std::hex << static_cast<uint32_t>(key.codepoint) << std::endl;
 			pty.WriteCodepoint(key.codepoint);
 			break;
 		case Keyboard::KeyType::KEYCODE:
+			std::cout << "Pressed 0x" << std::hex << static_cast<uint32_t>(key.keycode) << std::endl;
 			// TODO
 			break;
 		default: break;

@@ -10,7 +10,7 @@ OBJ = $(CPP:%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(OBJ:%.o=%.d)
 LDFLAGS = -l wiringPi
 
-all: clean raspi arduino
+all: raspi arduino
 
 arduino: arduino_upload
 
