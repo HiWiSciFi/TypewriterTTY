@@ -22,8 +22,6 @@ int writeKey(uint8_t keycode) {
 	KeymapEntry key = keymap[keycode];
 	if (!key.valid) return -1;
 
-	// return 0; // TODO: remove
-
 	if (key.mod & MOD_SHFT) outputKey(8, 6);
 	if (key.mod & MOD_CODE) outputKey(0, 3);
 
@@ -33,10 +31,9 @@ int writeKey(uint8_t keycode) {
 		if (key.mod & MOD_CODE) outputKey(0, 3);
 	}
 
-	waitForEdge(key.scan, FALLING);
-	for (int i = 0; i < 3; i++) {
-		waitForEdge(key.scan, RISING);
-		waitForEdge(key.scan, FALLING);
+	delay(100); // wait 100 ms for printing
+	if (keycode == 0x0a) { // LF
+		delay(2500); // wait for carriage to return
 	}
 
 	return 0;

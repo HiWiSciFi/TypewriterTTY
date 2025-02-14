@@ -40,6 +40,9 @@ void Printer::WaitForAvailable() {
 }
 
 void Printer::PrintCodepoint(char32_t codepoint) {
+	// TEMP
+	if (codepoint == 0x0000000d) return; // skip CR
+
 	if (!this->config->translationMap.contains(codepoint))
 		codepoint = this->config->printer.translationFallback;
 
