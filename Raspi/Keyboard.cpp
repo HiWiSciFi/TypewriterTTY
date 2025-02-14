@@ -22,15 +22,19 @@ void Keyboard::Setup() {
 	}
 }
 
+#include <iostream>
 Keyboard::KeyResult Keyboard::GetKey() {
 	KeyResult result = { KeyType::NONE, 0x00000000, 0x00 };
 
+	bool found = false;
 	for (int iscan = 0; iscan < this->config->pinsScan.size(); iscan++) {
 		digitalWrite(this->config->pinsScan[iscan], LOW);
 
 		// TODO: sleep
 		// TODO: check necessity
-		Util::Sleep(0, 1, 0);
+		// Util::Sleep(0, 1, 0);
+		timespec ts = { .tv_sec = 0, .tv_nsec = 1000000 * 1 };
+		nanosleep(&ts, &ts);
 
 		for (int iout = 0; iout < this->config->pinsOut.size(); iout++) {
 			KeyboardConfig::KeyboardKey mapKey = { { iscan, iout }, MOD_NONE };
@@ -41,6 +45,7 @@ Keyboard::KeyResult Keyboard::GetKey() {
 			if (digitalRead(this->config->pinsOut[iout]) == LOW) {
 				// check mod keys
 				digitalWrite(this->config->pinsScan[iscan], HIGH);
+				std::cout << "K: " << std::dec << iscan << "." << iout << std::endl;
 
 				for (const auto& modkey : this->config->modMap) {
 					if (modkey.second == MOD_NONE) continue;
@@ -49,27 +54,38 @@ Keyboard::KeyResult Keyboard::GetKey() {
 
 					// TODO: sleep
 					// TODO: check necessity
-					Util::Sleep(0, 1, 0);
+					// Util::Sleep(0, 1, 0);
+					ts = { .tv_sec = 0, .tv_nsec = 1000000 * 1 };
+					nanosleep(&ts, &ts);
 
 					if (digitalRead(this->config->pinsOut[modkey.first.out]) == LOW) {
 						mapKey.mod |= modkey.second;
 					}
 					digitalWrite(this->config->pinsScan[modkey.first.scan], HIGH);
 				}
+				digitalWrite(this->config->pinsScan[iscan], HIGH);
 
 				if (this->config->codepointMap.contains(mapKey)) {
 					// codepoint
 					result.type = KeyType::UNICODE;
 					result.codepoint = this->config->codepointMap.at(mapKey);
+					found = true;
+					break;
 				}
 				else if (this->config->keyMap.contains(mapKey)) {
 					// keycode
 					result.type = KeyType::KEYCODE;
 					result.keycode = this->config->keyMap.at(mapKey);
+					found = true;
+					break;
+				}
+				else {
+					std::cout << "Key not found" << std::endl;
 				}
 			}
 		}
 		digitalWrite(this->config->pinsScan[iscan], HIGH);
+		if (found) break;
 	}
 
 	return result;
