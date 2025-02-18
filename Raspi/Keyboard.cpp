@@ -45,7 +45,6 @@ Keyboard::KeyResult Keyboard::GetKey() {
 			if (digitalRead(this->config->pinsOut[iout]) == LOW) {
 				// check mod keys
 				digitalWrite(this->config->pinsScan[iscan], HIGH);
-				std::cout << "K: " << std::dec << iscan << "." << iout << std::endl;
 
 				for (const auto& modkey : this->config->modMap) {
 					if (modkey.second == MOD_NONE) continue;
