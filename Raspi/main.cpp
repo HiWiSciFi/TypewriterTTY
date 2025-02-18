@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 	std::cout << "Connecting to Arduino..." << std::endl;
 	Printer printer(printerCfg);
 	std::cout << "Waiting for Typewriter to become active..." << std::endl;
-	// printer.WaitForAvailable();
+	printer.WaitForAvailable();
 	std::cout << "Typewriter available." << std::endl;
 
 	std::cout << "Prepare shell environment..." << std::endl;
@@ -78,6 +78,6 @@ void RunPrinter(Printer& printer, PseudoTTY& pty) {
 	while (true) {
 		while (!pty.DataAvailable()); // TODO: recheck if fcntl is removed
 		char32_t codepoint = pty.ReadCodepoint();
-		// printer.PrintCodepoint(codepoint);
+		printer.PrintCodepoint(codepoint);
 	}
 }
