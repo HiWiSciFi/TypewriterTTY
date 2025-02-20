@@ -23,6 +23,8 @@ PseudoTTY::~PseudoTTY() {
 }
 
 bool PseudoTTY::DataAvailable() {
+	if (!this->config->pty.enabled) return false;
+
 	pollfd pfd = {
 		.fd = this->master,
 		.events = POLLIN,
@@ -33,6 +35,8 @@ bool PseudoTTY::DataAvailable() {
 }
 
 void PseudoTTY::WriteCodepoint(char32_t codepoint) {
+	if (!this->config->pty.enabled) return;
+
 	char8_t buf[4];
 	uint8_t length = Util::CodepointGetUTF8(codepoint, buf);
 
@@ -42,6 +46,8 @@ void PseudoTTY::WriteCodepoint(char32_t codepoint) {
 
 // TODO: maybe rework if fcntl gets removed
 char32_t PseudoTTY::ReadCodepoint() {
+	if (!this->config->pty.enabled) return 0;
+
 	char8_t buf[4];
 	char32_t codepoint = 0;
 
@@ -64,6 +70,8 @@ char32_t PseudoTTY::ReadCodepoint() {
 }
 
 void PseudoTTY::Open() {
+	if (!this->config->pty.enabled) return;
+	
 	winsize winp = {
 		.ws_row = this->config->window.rows,
 		.ws_col = this->config->window.columns,

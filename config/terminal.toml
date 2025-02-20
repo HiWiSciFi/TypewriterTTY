@@ -1,3 +1,6 @@
+[pty]
+enabled = true
+
 [environment]
 env_inherit = true
 TERM = "dumb"

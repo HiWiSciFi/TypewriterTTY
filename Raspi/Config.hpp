@@ -50,7 +50,8 @@ public:
 		std::string port;
 		int baud;
 	};
-	struct PrinterSettings{
+	struct PrinterSettings {
+		bool enabled;
 		char32_t translationFallback;
 	};
 
@@ -63,6 +64,10 @@ public:
 
 class TerminalConfig {
 public:
+	struct PtySettings {
+		bool enabled;
+	};
+
 	struct WindowSettings {
 		unsigned short columns;
 		unsigned short rows;
@@ -73,6 +78,7 @@ public:
 		std::vector<std::string> arguments;
 	};
 
+	PtySettings pty;
 	std::vector<std::string> environment;
 	WindowSettings window;
 	ShellSettings shell;

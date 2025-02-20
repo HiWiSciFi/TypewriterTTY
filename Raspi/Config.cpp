@@ -21,6 +21,7 @@ PrinterConfig::PrinterConfig(const std::string& path) {
 	this->serial.baud = serialSection.at("baud").as_integer();
 
 	auto printerSection = fileMap.at("printer").as_table();
+	this->printer.enabled = printerSection.at("enabled").as_boolean();
 	this->printer.translationFallback = printerSection.at("translation fallback").as_integer();
 
 	auto codepointSection = fileMap.at("translation").as_table();
@@ -102,6 +103,9 @@ KeyboardConfig::KeyboardConfig(const std::string& path) {
 
 TerminalConfig::TerminalConfig(const std::string& path) {
 	auto fileMap = toml::parse(path, toml::spec::v(1, 1, 0)).as_table();
+
+	auto ptySection = fileMap.at("pty");
+	this->pty.enabled = ptySection.at("enabled").as_boolean();
 
 	auto environmentSection = fileMap.at("environment").as_table();
 	bool inherit = environmentSection.at("env_inherit").as_boolean();
