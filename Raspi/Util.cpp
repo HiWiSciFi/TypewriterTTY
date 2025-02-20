@@ -62,7 +62,7 @@ char32_t Util::UTF8GetCodepoint(const char8_t* buffer, uint8_t length) {
 uint8_t Util::CodepointGetUTF8(char32_t codepoint, char8_t* buffer) {
 	uint8_t length = 0;
 
-	if (codepoint >= 0x0000'0000 && codepoint <= 0x0000'007F) {
+	if (codepoint <= 0x0000'007F) {
 		buffer[0] = codepoint;
 		length = 1;
 	}

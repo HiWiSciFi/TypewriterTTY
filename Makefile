@@ -1,14 +1,14 @@
 arduino_env := nanoevery
 
 CXX = g++
-CXX_FLAGS = -Wall -I./Raspi/dependencies/toml11/single_include
+CXX_FLAGS = -Wall -Wextra -Wpedantic -Werror -I./Raspi/dependencies/toml11/single_include
 CXX_STD = c++20
 BIN = typewriter
 OBJ_DIR = ./obj
 CPP = $(wildcard Raspi/*.cpp)
 OBJ = $(CPP:%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(OBJ:%.o=%.d)
-LDFLAGS = -l wiringPi
+LDFLAGS = -s -l wiringPi
 
 all: raspi arduino
 

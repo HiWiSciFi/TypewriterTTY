@@ -14,7 +14,7 @@ static constexpr const char* TERMINAL_CONFIG_PATH = "config/terminal.toml";
 void RunPrinter(Printer& printer, PseudoTTY& pty);
 void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty);
 
-int main(int argc, char** argv) {
+int main() {
 	std::cout << "Loading config files..." << std::endl;
 	std::cout << "Keyboard..." << std::endl;
 	auto keyboardCfg = std::make_shared<KeyboardConfig>(KEYBOARD_CONFIG_PATH);

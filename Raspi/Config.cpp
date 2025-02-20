@@ -118,9 +118,8 @@ TerminalConfig::TerminalConfig(const std::string& path) {
 	if (inherit) {
 		for (size_t i = 0; environ[i] != nullptr; i++) {
 			size_t offset = strcspn(environ[i], "=");
-			char var[offset + 1];
-			strncpy(var, environ[i], offset);
-			var[offset] = '\0';
+			std::string var(offset, '\0');
+			strncpy(var.data(), environ[i], offset);
 			if (environmentSection.contains(var)) continue;
 			this->environment.push_back(environ[i]);
 		}
