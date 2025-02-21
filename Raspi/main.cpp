@@ -12,7 +12,7 @@ static constexpr const char* PRINTER_CONFIG_PATH = "config/printer.toml";
 static constexpr const char* TERMINAL_CONFIG_PATH = "config/terminal.toml";
 
 void RunPrinter(Printer& printer, PseudoTTY& pty);
-void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty);
+void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty, Printer& printer);
 
 int main() {
 	std::cout << "Loading config files..." << std::endl;
@@ -33,6 +33,10 @@ int main() {
 	std::cout << "Prepare shell environment..." << std::endl;
 	PseudoTTY pty(terminalCfg);
 	std::cout << "Start shell..." << std::endl;
+	printer.PrintCodepoint(0x0A);
+	printer.PrintCodepoint(0x0A);
+	printer.PrintCodepoint(0x0A);
+	printer.PrintKeycode(0xA6);
 	pty.Open();
 
 	std::cout << "Done." << std::endl;
@@ -45,13 +49,13 @@ int main() {
 	default: // parent
 	{
 		Keyboard keyboard(keyboardCfg);
-		RunKeyboard(keyboard, pty);
+		RunKeyboard(keyboard, pty, printer);
 		break;
 	}
 	}
 }
 
-void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty) {
+void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty, Printer& printer) {
 	keyboard.Setup();
 
 	Keyboard::KeyResult lastKey = { Keyboard::KeyType::NONE, 0x00000000, 0x00 };
@@ -68,6 +72,9 @@ void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty) {
 		case Keyboard::KeyType::KEYCODE:
 			std::cout << "Pressed 0x" << std::hex << static_cast<uint32_t>(key.keycode) << std::endl;
 			// TODO
+			if (key.keycode == 0xA6) {
+				printer.PrintKeycode(key.keycode);
+			}
 			break;
 		default: break;
 		}

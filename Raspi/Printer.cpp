@@ -63,3 +63,15 @@ void Printer::PrintCodepoint(char32_t codepoint) {
 		}
 	}
 }
+
+void Printer::PrintKeycode(uint8_t keycode) {
+	if (!this->config->printer.enabled) return;
+
+	serialPutchar(this->serial, keycode);
+	while (!serialDataAvail(this->serial));
+	int response = serialGetchar(this->serial);
+
+	if (response != ASCII_ACK) {
+		// TODO
+	}
+}

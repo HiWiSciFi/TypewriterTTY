@@ -20,6 +20,7 @@ public:
 	void WaitForAvailable();
 
 	void PrintCodepoint(char32_t codepoint);
+	void PrintKeycode(uint8_t keycode);
 };
 
 #endif // __PRINTER_HPP

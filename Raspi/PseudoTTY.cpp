@@ -34,11 +34,19 @@ bool PseudoTTY::DataAvailable() {
 	return (pfd.revents & POLLIN) > 0;
 }
 
+#include <iostream>
 void PseudoTTY::WriteCodepoint(char32_t codepoint) {
-	if (!this->config->pty.enabled) return;
-
+	
 	char8_t buf[4];
 	uint8_t length = Util::CodepointGetUTF8(codepoint, buf);
+	
+	std::cout << "len: " << static_cast<int>(length) << " chars:";
+	for (int i = 0; i < length; i++) {
+		std::cout << " " << std::hex << static_cast<int>(buf[i]);
+	}
+	std::cout << std::endl;
+
+	if (!this->config->pty.enabled) return;
 
 	if (write(this->master, buf, length) == -1)
 		Util::ThrowErrno();

@@ -67,21 +67,22 @@ uint8_t Util::CodepointGetUTF8(char32_t codepoint, char8_t* buffer) {
 		length = 1;
 	}
 	else if (codepoint >= 0x0000'0080 && codepoint <= 0x0000'07FF) {
-		buffer[0] = (codepoint >> 8) & 0x1F;
-		buffer[1] = codepoint & 0x3F;
+		buffer[0] = ((codepoint >> 6) & 0b0001'1111) | 0b1100'0000;
+		buffer[1] = (codepoint & 0b0011'1111) | 0b1000'0000;
 		length = 2;
 	}
 	else if (codepoint >= 0x0000'0800 && codepoint <= 0x0000'7FFF) {
-		buffer[0] = (codepoint >> 16) & 0x0F;
-		buffer[1] = (codepoint >> 8) & 0x3F;
-		buffer[2] = codepoint & 0x3F;
+		buffer[0] = ((codepoint >> 12) & 0b0000'1111) | 0b1110'0000;
+		buffer[1] = ((codepoint >> 6) & 0b0011'1111) | 0b1000'0000;
+		buffer[2] = (codepoint & 0b0011'1111) | 0b1000'0000;
 		length = 3;
 	}
 	else if (codepoint >= 0x0001'0000 && codepoint <= 0x0010'FFFF) {
-		buffer[0] = (codepoint >> 24) & 0x07;
-		buffer[1] = (codepoint >> 16) & 0x3F;
-		buffer[2] = (codepoint >> 8) & 0x3F;
-		buffer[3] = codepoint & 0x3F;
+		
+		buffer[0] = ((codepoint >> 18) & 0b0000'0111) | 0b1111'0000;
+		buffer[1] = ((codepoint >> 12) & 0b0011'1111) | 0b1000'0000;
+		buffer[2] = ((codepoint >> 6) & 0b0011'1111) | 0b1000'0000;
+		buffer[3] = (codepoint & 0b0011'1111) | 0b1000'0000;
 		length = 4;
 	}
 	else {
