@@ -23,9 +23,8 @@ export PATH=$PATH:$HOME/.local/bin
 curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/system/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
 sudo service udev restart
 
-git clone --recursive https://github.com/HiWiSciFi/TypewriterTTY.git
+git clone https://github.com/HiWiSciFi/TypewriterTTY.git
 cd TypewriterTTY/Raspi
-make typewriter
-
-# RUN
-pio run -t upload -d ../Arduino
+git submodule init
+git submodule update
+make all
