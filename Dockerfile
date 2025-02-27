@@ -1,11 +1,12 @@
 # syntax=docker/dockerfile:1
 
-FROM debian
+FROM raspbian
 WORKDIR /app
 COPY ./config/* /etc/TypewriterTTY/
 COPY . .
 
-RUN bash ./inst.sh
+RUN /bin/bash ./inst.sh
+RUN make all
 
 RUN useradd app
 USER app
