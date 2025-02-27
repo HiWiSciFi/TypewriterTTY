@@ -7,9 +7,9 @@
 #include "PseudoTTY.hpp"
 #include "Util.hpp"
 
-static constexpr const char* KEYBOARD_CONFIG_PATH = "config/keyboard.toml";
-static constexpr const char* PRINTER_CONFIG_PATH = "config/printer.toml";
-static constexpr const char* TERMINAL_CONFIG_PATH = "config/terminal.toml";
+static constexpr const char* KEYBOARD_CONFIG_PATH = "/etc/TypewriterTTY/keyboard.toml";
+static constexpr const char* PRINTER_CONFIG_PATH = "/etc/TypewriterTTY/printer.toml";
+static constexpr const char* TERMINAL_CONFIG_PATH = "/etc/TypewriterTTY/terminal.toml";
 
 void RunPrinter(Printer& printer, PseudoTTY& pty);
 void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty, Printer& printer);
