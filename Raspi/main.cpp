@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <unistd.h>
 
 #include "Config.hpp"
 #include "Keyboard.hpp"

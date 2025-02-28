@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <sstream>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "Util.hpp"
 

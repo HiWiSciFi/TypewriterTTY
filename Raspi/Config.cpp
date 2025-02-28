@@ -13,6 +13,8 @@
 
 #include "Util.hpp"
 
+extern char **environ;
+
 PrinterConfig::PrinterConfig(const std::string& path) {
 	auto fileMap = toml::parse(path, toml::spec::v(1, 1, 0)).as_table();
 

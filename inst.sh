@@ -1,8 +1,5 @@
-# apt update
-# apt upgrade -y
-# apt update
-# apt full-upgrade -y
-apt install build-essential git python3 curl -y
+#!/bin/bash
+
 git clone https://github.com/WiringPi/WiringPi.git
 cd WiringPi
 ./build debian

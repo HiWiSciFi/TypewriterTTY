@@ -8,7 +8,7 @@ OBJ_DIR = ./obj
 CPP = $(wildcard Raspi/*.cpp)
 OBJ = $(CPP:%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(OBJ:%.o=%.d)
-LDFLAGS = -s -l wiringPi
+LDFLAGS = -s -lwiringPi -lutil
 
 all: raspi arduino
 
