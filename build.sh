@@ -10,6 +10,7 @@
 export PATH=$PATH:$HOME/.local/bin
 
 cd /app
-
 make all
-./typewriter
+
+cd /home/app
+/app/typewriter
