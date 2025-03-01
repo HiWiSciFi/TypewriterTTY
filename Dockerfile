@@ -10,10 +10,11 @@ RUN groupadd -g 993 gpio
 RUN useradd app -G dialout,gpio,kmem
 
 RUN apt update
-# RUN apt upgrade -y
-# RUN apt update
-# RUN apt full-upgrade -y
+RUN apt upgrade -y
+RUN apt update
+RUN apt full-upgrade -y
 RUN apt install build-essential git python3 python3-venv curl gettext fakeroot -y
+RUN apt install ssh ed netcat man cowsay -y
 
 RUN git clone https://github.com/WiringPi/WiringPi.git
 WORKDIR /app/WiringPi
@@ -34,8 +35,9 @@ RUN mkdir $HOME/.local/bin
 RUN ln -s ~/.platformio/penv/bin/platformio ~/.local/bin/platformio
 RUN ln -s ~/.platformio/penv/bin/pio ~/.local/bin/pio
 RUN ln -s ~/.platformio/penv/bin/piodebuggdb ~/.local/bin/piodebuggdb
-RUN export PATH=$PATH:$HOME/.local/bin
-
+RUN echo export PATH="$PATH:$HOME/.local/bin" >> /home/app/.bashrc
+RUN echo export PATH="$PATH:/usr/games" >> /home/app/.bashrc
+RUN echo export PS1='$ ' >> /home/app/.bashrc
 
 WORKDIR /home/app
 CMD [ "/app/build.sh" ]

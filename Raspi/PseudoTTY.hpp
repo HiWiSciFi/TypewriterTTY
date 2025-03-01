@@ -31,6 +31,8 @@ public:
 
 	//throws
 	void Open();
+
+	void Interrupt();
 };
 
 #endif // __PSEUDOTTY_HPP

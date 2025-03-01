@@ -75,6 +75,8 @@ void RunKeyboard(Keyboard& keyboard, PseudoTTY& pty, Printer& printer) {
 			// TODO
 			if (key.keycode == 0xA6) {
 				printer.PrintKeycode(key.keycode);
+			} else if (key.keycode == 0xFF) {
+				pty.Interrupt();
 			}
 			break;
 		default: break;

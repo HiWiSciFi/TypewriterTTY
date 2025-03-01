@@ -125,3 +125,8 @@ void PseudoTTY::Open() {
 		break;
 	}
 }
+
+void PseudoTTY::Interrupt() {
+	if (!this->config->pty.enabled) return;
+	kill(this->childPid, SIGINT);
+}
