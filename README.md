@@ -7,3 +7,16 @@
 ```
 curl -s https://raw.githubusercontent.com/HiWiSciFi/TypewriterTTY/refs/heads/development/Raspi/inst.sh | bash -s
 ```
+
+## Maybe in the future?
+- [ ] Rework Keyboard "hold-key-prevention" code
+- [ ] Imitate more unavailable characters
+- [ ] Make more characters available via custom keybinds
+- [ ] Make use of more builtin features
+- [ ] Make a PCB for better cable organization
+- [ ] Proper error handling
+- [ ] Properly handle CODE + C and CODE + D
+- [ ] Move pass-through keycodes to config file
+- [ ] Fully stable
+- [ ] Handle SIGCHLD
+- [ ] Log sensible data (clone pty + keyboard input metadata)
